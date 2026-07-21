@@ -1,0 +1,130 @@
+import { Service } from "typedi";
+import { Logger, LoggerInterface } from "../../decorators/Logger";
+import { Task } from "../models/tasks";
+import { TaskSubmission } from "../models/task-submissions";
+import { TaskRepository } from "../repositories/TaskRepository";
+import { TaskSubmissionRepository } from "../repositories/TaskSubmissionRepository";
+import { NotFoundError } from "../errors";
+import {
+  CreateTaskInput,
+  UpdateTaskInput,
+  AssignTaskInput,
+  ReviewSubmissionInput,
+} from "../../dto/task.dto";
+import { liveBus } from "../lib/eventBus";
+
+export interface TaskFilter {
+  status?: string;
+  q?: string;
+}
+
+@Service()
+export class TaskService {
+  constructor(
+    private taskRepository: TaskRepository,
+    private submissionRepository: TaskSubmissionRepository,
+    @Logger(__filename) private log: LoggerInterface,
+  ) {}
+
+  private repo() {
+    return this.taskRepository.repository;
+  }
+
+  private subRepo() {
+    return this.submissionRepository.repository;
+  }
+
+  async list(filter: TaskFilter): Promise<{ data: Task[]; total: number }> {
+    const where: Record<string, unknown> = {};
+    if (filter.status && filter.status !== "All") where.status = filter.status;
+    const all = await this.repo().find({ where, order: { deadline: "ASC" } });
+    const data = filter.q
+      ? all.filter((t) => `${t.id}${t.title}${t.description}`.toLowerCase().includes(filter.q!.toLowerCase()))
+      : all;
+    return { data, total: data.length };
+  }
+
+  async getById(id: string): Promise<Task> {
+    const task = await this.repo().findOne({ where: { id } });
+    if (!task) throw new NotFoundError(`Task ${id} not found`);
+    return task;
+  }
+
+  async create(input: CreateTaskInput): Promise<Task> {
+    if (!input.title?.trim()) throw new NotFoundError("Title is required");
+    const task = this.repo().create({
+      title: input.title,
+      description: input.description,
+      deadline: input.deadline ? new Date(input.deadline) : undefined,
+      reward: input.reward ?? 0,
+      status: input.status ?? "Active",
+    } as Partial<Task>);
+    const saved = await this.repo().save(task);
+    liveBus.broadcast({ type: "tasks" });
+    return saved;
+  }
+
+  async update(id: string, input: UpdateTaskInput): Promise<Task> {
+    const repo = this.repo();
+    const task = await this.getById(id);
+    repo.merge(task, input);
+    const saved = await repo.save(task);
+    liveBus.broadcast({ type: "tasks" });
+    return saved;
+  }
+
+  async remove(id: string): Promise<void> {
+    const repo = this.repo();
+    const task = await this.getById(id);
+    await repo.remove(task);
+    liveBus.broadcast({ type: "tasks" });
+  }
+
+  async assign(id: string, input: AssignTaskInput): Promise<TaskSubmission> {
+    const task = await this.getById(id);
+    const submission = this.subRepo().create({
+      submissionId: `TS-${Date.now()}`,
+      ambassadorId: input.ambassador,
+      taskId: task.id,
+      college: input.college,
+      task: task.title,
+      status: "Pending Review",
+    } as Partial<TaskSubmission>);
+    const saved = await this.subRepo().save(submission);
+
+    task.assignedCount = (task.assignedCount ?? 0) + 1;
+    await this.repo().save(task);
+    liveBus.broadcast({ type: "tasks" });
+    return saved;
+  }
+
+  async review(submissionId: string, input: ReviewSubmissionInput): Promise<TaskSubmission> {
+    const repo = this.subRepo();
+    const submission = await repo.findOne({ where: { submissionId } });
+    if (!submission) throw new NotFoundError(`Submission ${submissionId} not found`);
+    submission.status = input.status;
+    if (input.rejectReason) submission.rejectReason = input.rejectReason;
+    const saved = await repo.save(submission);
+
+    if (input.status === "Approved") {
+      const task = await this.repo().findOne({ where: { title: submission.task } });
+      if (task) {
+        task.completedCount = (task.completedCount ?? 0) + 1;
+        await this.repo().save(task);
+      }
+    }
+    liveBus.broadcast({ type: "tasks" });
+    return saved;
+  }
+
+  async submissions(status?: string): Promise<{ data: TaskSubmission[]; total: number }> {
+    const where: Record<string, unknown> = {};
+    if (status) where.status = status;
+    const data = await this.subRepo().find({ where, order: { createdAt: "DESC" } });
+    return { data, total: data.length };
+  }
+
+  async updateSubmission(submission: TaskSubmission): Promise<TaskSubmission> {
+    return this.subRepo().save(submission);
+  }
+}

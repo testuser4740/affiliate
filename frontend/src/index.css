@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Gajab Brand Tokens — Orange + Navy */
+    --background: 32 100% 97%;            /* cream surface */
+    --foreground: 221 50% 18%;            /* navy text */
+    --card: 0 0% 100%;
+    --card-foreground: 221 50% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 50% 18%;
+    --primary: 18 90% 53%;                /* Gajab Orange #F26B1F */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 32 100% 95%;
+    --secondary-foreground: 221 50% 18%;
+    --muted: 32 50% 95%;
+    --muted-foreground: 221 20% 40%;
+    --accent: 45 100% 62%;                /* Warm Yellow #FFC93C */
+    --accent-foreground: 221 50% 18%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 32 40% 88%;
+    --input: 32 40% 88%;
+    --ring: 18 90% 53%;
+    --radius: 0.875rem;
+
+    --chart-1: 18 90% 53%;
+    --chart-2: 45 100% 62%;
+    --chart-3: 221 50% 22%;
+    --chart-4: 172 66% 40%;
+    --chart-5: 273 60% 56%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  html, body { @apply bg-background text-foreground; }
+  body {
+    margin: 0;
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #FFF7EE;
+    background-image: radial-gradient(circle at 1px 1px, rgba(27,45,84,0.05) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .font-display {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  ::selection { background: #FFC93C; color: #1B2D54; }
+}
+
+@layer components {
+  .gajab-card {
+    @apply bg-white rounded-2xl border border-[#EFEAE0] shadow-[0_2px_8px_rgba(27,45,84,0.06)] transition-all;
+  }
+  .gajab-card:hover {
+    @apply shadow-[0_8px_24px_rgba(27,45,84,0.10)];
+  }
+  .gajab-card-soft {
+    @apply bg-white rounded-2xl border border-[#F0EBE2] shadow-sm;
+  }
+  .gajab-sticker {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+    font-family: 'Poppins', sans-serif;
+  }
+  .gajab-sticker-yellow {
+    @apply gajab-sticker bg-[#FFF1C2] text-[#1B2D54] border border-[#FFC93C]/50;
+  }
+  .gajab-sticker-orange {
+    @apply gajab-sticker bg-[#FFE9D9] text-[#C9450C] border border-[#F26B1F]/40;
+  }
+  .gajab-sticker-navy {
+    @apply gajab-sticker bg-[#1B2D54] text-white;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#F26B1F] text-white font-bold shadow-[0_4px_12px_rgba(242,107,31,0.30)] hover:shadow-[0_6px_18px_rgba(242,107,31,0.40)] hover:-translate-y-0.5 active:translate-y-0 transition-all;
+  }
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#FFC93C] text-[#1B2D54] font-bold shadow-[0_4px_12px_rgba(255,201,60,0.35)] hover:shadow-[0_6px_18px_rgba(255,201,60,0.45)] hover:-translate-y-0.5 active:translate-y-0 transition-all;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-[#1B2D54] font-bold border border-[#E5DDD0] hover:bg-[#FFF7EE] hover:border-[#F26B1F]/40 transition-all;
+  }
+  .input-gajab {
+    @apply w-full h-12 px-4 rounded-xl bg-white border border-[#E5DDD0] focus:outline-none focus:border-[#F26B1F] focus:ring-4 focus:ring-[#F26B1F]/15 transition-all font-medium text-[#1B2D54];
+  }
+  .nav-tab {
+    @apply px-4 py-2 rounded-full text-sm font-bold transition-all;
+  }
+  .marquee-track {
+    animation: marquee 30s linear infinite;
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+.wiggle { animation: wiggle 2.5s ease-in-out infinite; }
+
+@layer base {
+  [data-debug-wrapper="true"] { display: contents !important; }
+}

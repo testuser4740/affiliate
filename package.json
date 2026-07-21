@@ -1,0 +1,42 @@
+{
+  "name": "gajab-affiliate",
+  "version": "1.0.0",
+  "description": "Gajab Campus Ambassador affiliate program - TypeORM entities",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/app.js",
+    "dev": "nodemon --watch src --ext ts,json --exec ts-node src/app.ts",
+    "schema:sync": "ts-node src/commands/sync.ts",
+    "seed": "ts-node src/commands/seed.ts",
+    "test": "for f in tests/*.test.ts; do npx ts-node \"$f\" || exit 1; done"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.19",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.4",
+    "class-validator-jsonschema": "^5.1.0",
+    "cors": "^2.8.6",
+    "ejs": "^6.0.1",
+    "express": "^4.19.2",
+    "lusca": "^1.7.0",
+    "microframework-w3tec": "^0.6.3",
+    "pg": "^8.11.3",
+    "reflect-metadata": "^0.2.1",
+    "routing-controllers": "^0.11.3",
+    "routing-controllers-openapi": "^5.0.1",
+    "swagger-ui-express": "^5.0.1",
+    "typedi": "^0.10.0",
+    "typeorm": "^0.3.20",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.0",
+    "@types/swagger-ui-express": "^4.1.8",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}

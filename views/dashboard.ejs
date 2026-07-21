@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gajab · Affiliate Dashboard</title>
+  <style>
+    :root {
+      --navy: #1B2D54; --orange: #F26B1F; --ink: #1A1A1A; --muted: #5A6378;
+      --card: #ffffff; --bg: #F7F4EE; --line: #EFEAE0; --green: #065F46;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
+    .topbar { background: var(--navy); color: #fff; padding: 14px 22px; display: flex; align-items: center; gap: 14px; }
+    .brand { font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
+    .brand span { color: #FFC93C; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 22px; }
+    .selector { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    select, input[type="date"] { padding: 8px 10px; border-radius: 10px; border: 1px solid #2c406e; background: #22335f; color: #fff; font-size: 13px; }
+    .hero { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; background: linear-gradient(120deg, var(--orange), #ff9a4d); color: #fff; border-radius: 18px; padding: 20px 24px; }
+    .avatar { width: 64px; height: 64px; border-radius: 50%; background: #fff3; display: grid; place-items: center; font-size: 26px; font-weight: 800; }
+    .hero h1 { margin: 0; font-size: 22px; }
+    .hero .sub { opacity: 0.95; font-size: 13px; }
+    .pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #fff3; margin-left: 8px; }
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-top: 18px; }
+    .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+    .kpi .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+    .kpi .val { font-size: 24px; font-weight: 800; margin-top: 6px; }
+    .kpi .val.orange { color: var(--orange); }
+    .kpi .val.green { color: var(--green); }
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-top: 18px; }
+    @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+    .card h2 { font-size: 16px; margin: 0 0 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); }
+    th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 700; }
+    .tag.paid { background: #D1FAE5; color: var(--green); }
+    .tag.pending { background: #FEF3C7; color: #92400E; }
+    .tag.confirmed { background: #DBEAFE; color: #1e40af; }
+    .tag.cancelled { background: #FEE2E2; color: #991B1B; }
+    .tag.locked { background: #E5E7EB; color: #374151; }
+    .ann { border-bottom: 1px solid var(--line); padding: 10px 0; }
+    .ann:last-child { border-bottom: 0; }
+    .ann .t { font-weight: 700; font-size: 13px; }
+    .ann .m { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .prio { font-size: 10px; padding: 2px 7px; border-radius: 999px; font-weight: 700; margin-left: 6px; }
+    .prio.High { background: #FEE2E2; color: #991B1B; }
+    .prio.Medium { background: #FEF3C7; color: #92400E; }
+    .prio.Low { background: #E0E7FF; color: #3730A3; }
+    .bar { display: flex; align-items: flex-end; gap: 6px; height: 90px; margin-top: 8px; }
+    .bar > div { flex: 1; background: var(--orange); border-radius: 6px 6px 0 0; opacity: 0.85; }
+    .empty { color: var(--muted); font-size: 13px; padding: 12px 0; }
+    .foot { text-align: center; color: var(--muted); font-size: 12px; padding: 22px; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">Gajab<span>·</span>Affiliate</div>
+    <div class="selector">
+      <form method="get" action="/dashboard" style="display:flex;gap:8px;align-items:center;">
+        <select name="ambassadorId" onchange="this.form.submit()">
+          <% ambassadors.forEach(function(a){ %>
+            <option value="<%= a.id %>" <%= a.id === selectedId ? 'selected' : '' %>><%= a.name %> · <%= a.tier %></option>
+          <% }); %>
+        </select>
+        <input type="date" name="from" value="<%= from || '' %>" />
+        <input type="date" name="to" value="<%= to || '' %>" />
+        <button type="submit" style="padding:8px 12px;border-radius:10px;border:0;background:#FFC93C;font-weight:700;cursor:pointer;">Go</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <% if (!ambassador) { %>
+      <div class="card"><div class="empty">No ambassadors found. Seed the database or create one via <code>POST /api/admin/ambassadors</code>.</div></div>
+    <% } else { %>
+      <div class="hero">
+        <div class="avatar"><%= ambassador.name.charAt(0) %></div>
+        <div>
+          <h1><%= ambassador.name %><span class="pill"><%= ambassador.tier %> · <%= ambassador.commissionPct %>%</span></h1>
+          <div class="sub"><%= ambassador.college %> · <%= ambassador.city %>, <%= ambassador.state %> · Rank #<%= ambassador.rank %></div>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="label">Revenue</div><div class="val">₹<%= (totals.revenue/1000).toFixed(1) %>K</div></div>
+        <div class="kpi"><div class="label">Commission</div><div class="val orange">₹<%= (totals.commission/1000).toFixed(1) %>K</div></div>
+        <div class="kpi"><div class="label">Paid</div><div class="val green">₹<%= (paidCommission/1000).toFixed(1) %>K</div></div>
+        <div class="kpi"><div class="label">Pending</div><div class="val">₹<%= (pendingCommission/1000).toFixed(1) %>K</div></div>
+        <div class="kpi"><div class="label">Clicks</div><div class="val"><%= totals.clicks.toLocaleString() %></div></div>
+        <div class="kpi"><div class="label">Orders</div><div class="val"><%= totals.orders.toLocaleString() %></div></div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <h2>Affiliate Links</h2>
+            <% if (urls.length === 0) { %><div class="empty">No links yet.</div><% } else { %>
+            <table>
+              <thead><tr><th>Label</th><th>Channel</th><th class="num">Clicks</th><th class="num">Orders</th><th class="num">Revenue</th><th class="num">Commission</th></tr></thead>
+              <tbody>
+                <% urls.forEach(function(u){ %>
+                  <tr>
+                    <td><%= u.label %></td>
+                    <td><%= u.channel %></td>
+                    <td class="num"><%= (u.clicks||0).toLocaleString() %></td>
+                    <td class="num"><%= (u.orders||0).toLocaleString() %></td>
+                    <td class="num">₹<%= Number(u.revenue||0).toLocaleString() %></td>
+                    <td class="num" style="color:var(--orange);font-weight:700;">₹<%= Number(u.commission||0).toLocaleString() %></td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+            <% } %>
+          </div>
+
+          <div class="card">
+            <h2>Commission History</h2>
+            <% if (commissionRows.length === 0) { %><div class="empty">No orders tracked for this ambassador yet.</div><% } else { %>
+            <table>
+              <thead><tr><th>Order</th><th>Product</th><th>Date</th><th class="num">Value</th><th class="num">%</th><th class="num">Commission</th><th>Status</th></tr></thead>
+              <tbody>
+                <% commissionRows.forEach(function(c){ %>
+                  <tr>
+                    <td class="mono"><%= c.id %></td>
+                    <td><%= c.product %></td>
+                    <td><%= c.date %></td>
+                    <td class="num">₹<%= Number(c.orderValue||0).toLocaleString() %></td>
+                    <td class="num"><%= c.commissionPct %>%</td>
+                    <td class="num" style="color:var(--orange);font-weight:700;">₹<%= Number(c.commission||0).toLocaleString() %></td>
+                    <td><span class="tag <%= c.payoutStatus.toLowerCase() %>"><%= c.payoutStatus %></span></td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+            <% } %>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <h2>Activity (clicks)</h2>
+            <div class="bar">
+              <% activity.slice(-14).forEach(function(l){ var max = Math.max.apply(null, activity.map(function(x){return x.clicks||0;}).concat([1])); %>
+                <div title="<%= l.date %>" style="height:<%= Math.round(((l.clicks||0)/max)*100) %>%"></div>
+              <% }); %>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Announcements</h2>
+            <% if (announcements.length === 0) { %><div class="empty">No announcements.</div><% } else { %>
+              <% announcements.forEach(function(a){ %>
+                <div class="ann">
+                  <div class="t"><%= a.title %><span class="prio <%= a.priority %>"><%= a.priority %></span></div>
+                  <div class="m"><%= a.body %></div>
+                </div>
+              <% }); %>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="foot">Gajab Campus Ambassador Program · dashboard served at <code>/dashboard</code> · API at <code>/api</code> · Swagger at <code>/api/docs</code></div>
+  </div>
+</body>
+</html>

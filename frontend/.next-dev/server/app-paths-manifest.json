@@ -1,0 +1,7 @@
+{
+  "/dashboard/inbox/page": "app/dashboard/inbox/page.js",
+  "/admin/applicants/page": "app/admin/applicants/page.js",
+  "/admin/directory/page": "app/admin/directory/page.js",
+  "/dashboard/leaderboard/page": "app/dashboard/leaderboard/page.js",
+  "/admin/announcements/page": "app/admin/announcements/page.js"
+}

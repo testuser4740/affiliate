@@ -1,0 +1,1 @@
+{"version":3,"file":"InboxRepository.js","sourceRoot":"","sources":["../../../src/api/repositories/InboxRepository.ts"],"names":[],"mappings":";;;;AACA,mCAAiC;AACjC,6DAAwD;AACxD,+DAA4D;AAGrD,IAAM,eAAe,GAArB,MAAM,eAAe;IAExB;QACI,IAAI,CAAC,UAAU,GAAG,IAAA,6BAAa,GAAE,CAAC,aAAa,CAAC,6BAAY,CAAC,CAAC;IAClE,CAAC;CACJ,CAAA;AALY,0CAAe;0BAAf,eAAe;IAD3B,IAAA,gBAAO,GAAE;;GACG,eAAe,CAK3B"}
