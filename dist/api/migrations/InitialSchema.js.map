@@ -1,1 +1,0 @@
-{"version":3,"file":"InitialSchema.js","sourceRoot":"","sources":["../../../src/api/migrations/InitialSchema.ts"],"names":[],"mappings":";;;AAEA;;;;;;;;;;;;GAYG;AACH,MAAa,0BAA0B;IAC9B,KAAK,CAAC,EAAE,CAAC,YAAyB;QACvC,2DAA2D;IAC7D,CAAC;IAEM,KAAK,CAAC,IAAI,CAAC,YAAyB;QACzC,SAAS;IACX,CAAC;CACF;AARD,gEAQC"}
