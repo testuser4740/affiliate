@@ -23,6 +23,13 @@ export class AnalyticsController {
    *     tags: [Admin / Analytics]
    *     summary: KPI summary
    */
+  /**
+   * @openapi
+   * /admin/analytics/kpis:
+   *   get:
+   *     tags: [Admin / Analytics]
+   *     summary: KPI summary
+   */
   @Get("/kpis")
   async kpis() {
     return this.service.kpis();

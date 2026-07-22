@@ -14,6 +14,24 @@ export class AuthController {
   @Inject()
   private authService!: AuthService;
 
+  /**
+   * @openapi
+   * /auth/login:
+   *   post:
+   *     tags: [Auth]
+   *     summary: Login with email and password
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required: [email, password]
+   *             properties:
+   *               email: { type: string }
+   *               password: { type: string }
+   *       }
+   */
   @Post("/login")
   async login(@Body() body: LoginInput) {
     if (!body || !body.email || !body.password) {

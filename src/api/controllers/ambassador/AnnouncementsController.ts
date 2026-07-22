@@ -21,6 +21,13 @@ export class AmbassadorAnnouncementController {
   @Inject()
   private ambassadorService!: AmbassadorService;
 
+  /**
+   * @openapi
+   * /ambassador/{ambassadorId}/announcements:
+   *   get:
+   *     tags: [Ambassador / Announcements]
+   *     summary: Announcements visible to this ambassador
+   */
   @Get("/:ambassadorId/announcements")
   @ResponseSchema(Announcement, { isArray: true })
   async announcements(
@@ -30,6 +37,13 @@ export class AmbassadorAnnouncementController {
     return this.service.getForAmbassador(ambassadorId);
   }
 
+  /**
+   * @openapi
+   * /ambassador/{ambassadorId}/announcements/{announcementId}/read:
+   *   post:
+   *     tags: [Ambassador / Announcements]
+   *     summary: Mark an announcement as read
+   */
   @Post("/:ambassadorId/announcements/:announcementId/read")
   async markRead(
     @Param("ambassadorId") ambassadorId: string,
@@ -39,6 +53,13 @@ export class AmbassadorAnnouncementController {
     return { success: true };
   }
 
+  /**
+   * @openapi
+   * /ambassador/{ambassadorId}/announcements/{announcementId}/read-status:
+   *   get:
+   *     tags: [Ambassador / Announcements]
+   *     summary: Get read status for an announcement
+   */
   @Get("/:ambassadorId/announcements/:announcementId/read-status")
   async getReadStatus(
     @Param("ambassadorId") ambassadorId: string,

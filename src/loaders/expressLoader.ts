@@ -90,7 +90,7 @@ export const expressLoader: MicroframeworkLoader = async (settings: Microframewo
     // Swagger UI
     const spec = routingControllersToSpec(
         require('routing-controllers').getMetadataArgsStorage(),
-        { routePrefix: env.app.routePrefix, controllers: [] },
+        { routePrefix: env.app.routePrefix, controllers: [path.join(__dirname, '../api/controllers/**')] },
         { info: { title: 'Gajab Admin API', version: '1.0.0' }, components: { schemas: swaggerSchemas } },
     );
     expressApp.use('/api/docs', swaggerUi.serve, swaggerUi.setup(spec));

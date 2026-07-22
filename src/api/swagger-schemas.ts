@@ -163,16 +163,21 @@ export const swaggerSchemas: Record<string, SchemaObject> = {
   },
 
   // --- DTOs ---
-  CreateApplicantDto: {
+  CreateApplicantInput: {
     type: "object",
     required: ["name", "phone", "email", "college", "city", "state"],
     properties: {
       name: { type: "string" },
       phone: { type: "string" },
+      whatsapp: { type: "string", nullable: true },
       email: { type: "string" },
       college: { type: "string" },
       city: { type: "string" },
       state: { type: "string" },
+      year: { type: "string", nullable: true },
+      instagram: { type: "string", nullable: true },
+      linkedin: { type: "string", nullable: true },
+      clubInvolvement: { type: "string", nullable: true },
       commissionPct: { type: "integer" },
       appliedOn: { type: "string", format: "date" },
       status: { type: "string" },
@@ -180,18 +185,76 @@ export const swaggerSchemas: Record<string, SchemaObject> = {
     },
   },
 
-  CreateAnnouncementDto: {
+  UpdateApplicantInput: {
+    type: "object",
+    properties: {
+      name: { type: "string" },
+      phone: { type: "string" },
+      whatsapp: { type: "string", nullable: true },
+      email: { type: "string" },
+      college: { type: "string" },
+      city: { type: "string" },
+      state: { type: "string" },
+      year: { type: "string", nullable: true },
+      instagram: { type: "string", nullable: true },
+      linkedin: { type: "string", nullable: true },
+      clubInvolvement: { type: "string", nullable: true },
+      commissionPct: { type: "integer" },
+      status: { type: "string" },
+      comments: { type: "string" },
+    },
+  },
+
+  ApplicantActionInput: {
+    type: "object",
+    properties: {
+      comment: { type: "string" },
+    },
+  },
+
+  ConvertApplicantInput: {
+    type: "object",
+    required: ["password"],
+    properties: {
+      password: { type: "string" },
+      name: { type: "string" },
+      email: { type: "string" },
+      phone: { type: "string" },
+      college: { type: "string" },
+      city: { type: "string" },
+      state: { type: "string" },
+      commissionPct: { type: "integer" },
+    },
+  },
+
+  CreateAnnouncementInput: {
     type: "object",
     required: ["title"],
     properties: {
       title: { type: "string" },
       body: { type: "string" },
-      audience: { type: "string", enum: ["All Ambassadors", "Gold + Platinum tiers", "Silver tier", "Bronze tier", "Specific city"] },
+      audience: { type: "string", enum: ["All Ambassadors", "Gold + Platinum tiers", "Silver tier", "Bronze tier", "Specific city", "Specific state"] },
       priority: { type: "string", enum: ["High", "Medium", "Low"] },
+      tier: { type: "string", nullable: true },
+      city: { type: "string", nullable: true },
+      state: { type: "string", nullable: true },
     },
   },
 
-  CreateAffiliateUrlDto: {
+  UpdateAnnouncementInput: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      body: { type: "string" },
+      audience: { type: "string" },
+      priority: { type: "string", enum: ["High", "Medium", "Low"] },
+      tier: { type: "string", nullable: true },
+      city: { type: "string", nullable: true },
+      state: { type: "string", nullable: true },
+    },
+  },
+
+  CreateAffiliateUrlInput: {
     type: "object",
     required: ["url"],
     properties: {
@@ -204,7 +267,19 @@ export const swaggerSchemas: Record<string, SchemaObject> = {
     },
   },
 
-  CreateCommissionOverrideDto: {
+  UpdateAffiliateUrlInput: {
+    type: "object",
+    properties: {
+      url: { type: "string" },
+      ambassador: { type: "string" },
+      college: { type: "string" },
+      label: { type: "string" },
+      campaign: { type: "string" },
+      channel: { type: "string" },
+    },
+  },
+
+  CreateCommissionOverrideInput: {
     type: "object",
     required: ["label"],
     properties: {
@@ -218,7 +293,20 @@ export const swaggerSchemas: Record<string, SchemaObject> = {
     },
   },
 
-  CreateTaskDto: {
+  UpdateCommissionOverrideInput: {
+    type: "object",
+    properties: {
+      label: { type: "string" },
+      appliesTo: { type: "string" },
+      overridePct: { type: "integer" },
+      originalPct: { type: "integer" },
+      startDate: { type: "string", format: "date" },
+      endDate: { type: "string", format: "date" },
+      status: { type: "string", enum: ["Scheduled", "Active", "Expired"] },
+    },
+  },
+
+  CreateTaskInput: {
     type: "object",
     required: ["title"],
     properties: {
@@ -230,7 +318,18 @@ export const swaggerSchemas: Record<string, SchemaObject> = {
     },
   },
 
-  AssignTaskDto: {
+  UpdateTaskInput: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      description: { type: "string" },
+      deadline: { type: "string", format: "date" },
+      reward: { type: "integer" },
+      status: { type: "string", enum: ["Active", "Closed"] },
+    },
+  },
+
+  AssignTaskInput: {
     type: "object",
     required: ["ambassador"],
     properties: {
@@ -239,7 +338,7 @@ export const swaggerSchemas: Record<string, SchemaObject> = {
     },
   },
 
-  ReviewSubmissionDto: {
+  ReviewSubmissionInput: {
     type: "object",
     required: ["status"],
     properties: {
@@ -248,7 +347,7 @@ export const swaggerSchemas: Record<string, SchemaObject> = {
     },
   },
 
-  CreatePocDto: {
+  CreatePocInput: {
     type: "object",
     required: ["name", "role"],
     properties: {
@@ -259,6 +358,29 @@ export const swaggerSchemas: Record<string, SchemaObject> = {
       phone: { type: "string" },
       whatsapp: { type: "string" },
       workingHours: { type: "string" },
+    },
+  },
+
+  UpdatePocInput: {
+    type: "object",
+    properties: {
+      name: { type: "string" },
+      role: { type: "string" },
+      region: { type: "string" },
+      email: { type: "string" },
+      phone: { type: "string" },
+      whatsapp: { type: "string" },
+      avatar: { type: "string" },
+      workingHours: { type: "string" },
+    },
+  },
+
+  LoginInput: {
+    type: "object",
+    required: ["email", "password"],
+    properties: {
+      email: { type: "string" },
+      password: { type: "string" },
     },
   },
 

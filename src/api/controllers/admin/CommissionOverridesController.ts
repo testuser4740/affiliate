@@ -42,12 +42,40 @@ export class CommissionOverrideController {
     return this.service.getById(id);
   }
 
+  /**
+   * @openapi
+   * /admin/commission-overrides:
+   *   post:
+   *     tags: [Admin / Commission Overrides]
+   *     summary: Create a commission override
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/CreateCommissionOverrideInput'
+   *       }
+   */
   @Post("/")
   @ResponseSchema(CommissionOverride)
   async create(@Body() body: CreateCommissionOverrideInput): Promise<CommissionOverride> {
     return this.service.create(body);
   }
 
+  /**
+   * @openapi
+   * /admin/commission-overrides/{id}:
+   *   put:
+   *     tags: [Admin / Commission Overrides]
+   *     summary: Update a commission override
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateCommissionOverrideInput'
+   *       }
+   */
   @Put("/:id")
   @ResponseSchema(CommissionOverride)
   async update(@Param("id") id: string, @Body() body: UpdateCommissionOverrideInput): Promise<CommissionOverride> {

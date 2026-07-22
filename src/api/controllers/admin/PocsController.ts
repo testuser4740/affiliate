@@ -24,6 +24,13 @@ export class PocController {
   @Inject()
   private service!: PocService;
 
+  /**
+   * @openapi
+   * /admin/pocs:
+   *   get:
+   *     tags: [Admin / POCs]
+   *     summary: List POCs
+   */
   @Get("/")
   @ResponseSchema(Poc, { isArray: true })
   async list(
@@ -40,12 +47,40 @@ export class PocController {
     return this.service.getById(id);
   }
 
+  /**
+   * @openapi
+   * /admin/pocs:
+   *   post:
+   *     tags: [Admin / POCs]
+   *     summary: Create a POC
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/CreatePocInput'
+   *       }
+   */
   @Post("/")
   @ResponseSchema(Poc)
   async create(@Body() body: CreatePocInput): Promise<Poc> {
     return this.service.create(body);
   }
 
+  /**
+   * @openapi
+   * /admin/pocs/{id}:
+   *   put:
+   *     tags: [Admin / POCs]
+   *     summary: Update a POC
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdatePocInput'
+   *       }
+   */
   @Put("/:id")
   @ResponseSchema(Poc)
   async update(@Param("id") id: string, @Body() body: UpdatePocInput): Promise<Poc> {

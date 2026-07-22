@@ -24,6 +24,13 @@ export class AmbassadorTaskController {
     private ambassadorService: AmbassadorService,
   ) {}
 
+  /**
+   * @openapi
+   * /ambassador/{ambassadorId}/tasks:
+   *   get:
+   *     tags: [Ambassador / Tasks]
+   *     summary: Assigned tasks for the ambassador
+   */
   @Get("/:ambassadorId/tasks")
   @ResponseSchema(Task, { isArray: true })
   async tasks(
@@ -34,6 +41,13 @@ export class AmbassadorTaskController {
     return data;
   }
 
+  /**
+   * @openapi
+   * /ambassador/{ambassadorId}/tasks/submissions:
+   *   get:
+   *     tags: [Ambassador / Tasks]
+   *     summary: My task submissions
+   */
   @Get("/:ambassadorId/tasks/submissions")
   @ResponseSchema(TaskSubmission, { isArray: true })
   async mySubmissions(@Param("ambassadorId") ambassadorId: string): Promise<TaskSubmission[]> {
@@ -41,6 +55,23 @@ export class AmbassadorTaskController {
     return data.filter((s) => s.ambassadorId === ambassadorId);
   }
 
+  /**
+   * @openapi
+   * /ambassador/{ambassadorId}/tasks/{taskId}/submit:
+   *   post:
+   *     tags: [Ambassador / Tasks]
+   *     summary: Submit task proof
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               proof: { type: string }
+   *               college: { type: string }
+   *       }
+   */
   @Post("/:ambassadorId/tasks/:taskId/submit")
   @ResponseSchema(TaskSubmission)
   async submitTask(

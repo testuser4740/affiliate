@@ -50,6 +50,20 @@ export class AmbassadorHomeController {
 
   @Put("/:ambassadorId/profile")
   @ResponseSchema(Ambassador)
+  /**
+   * @openapi
+   * /ambassador/{ambassadorId}/profile:
+   *   put:
+   *     tags: [Ambassador / Home]
+   *     summary: Update own profile
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateAmbassadorInput'
+   *       }
+   */
   async updateProfile(
     @Param("ambassadorId") ambassadorId: string,
     @Body() body: UpdateAmbassadorInput,

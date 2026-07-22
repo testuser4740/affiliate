@@ -56,12 +56,40 @@ export class ApplicantController {
     return this.service.getById(id);
   }
 
+  /**
+   * @openapi
+   * /admin/applicants:
+   *   post:
+   *     tags: [Admin / Applicants]
+   *     summary: Create an applicant
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/CreateApplicantInput'
+   *       }
+   */
   @Post("/")
   @ResponseSchema(Applicant)
   async create(@Body() body: CreateApplicantInput): Promise<Applicant> {
     return this.service.create(body);
   }
 
+  /**
+   * @openapi
+   * /admin/applicants/{id}:
+   *   put:
+   *     tags: [Admin / Applicants]
+   *     summary: Update an applicant
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateApplicantInput'
+   *       }
+   */
   @Put("/:id")
   @ResponseSchema(Applicant)
   async update(@Param("id") id: string, @Body() body: UpdateApplicantInput): Promise<Applicant> {
@@ -87,12 +115,40 @@ export class ApplicantController {
     return this.service.approve(id);
   }
 
+  /**
+   * @openapi
+   * /admin/applicants/{id}/partial:
+   *   post:
+   *     tags: [Admin / Applicants]
+   *     summary: Partially approve an applicant
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/ApplicantActionInput'
+   *       }
+   */
   @Post("/:id/partial")
   @ResponseSchema(Applicant)
   async partial(@Param("id") id: string, @Body() body: ApplicantActionInput): Promise<Applicant> {
     return this.service.partiallyApprove(id, body);
   }
 
+  /**
+   * @openapi
+   * /admin/applicants/{id}/reject:
+   *   post:
+   *     tags: [Admin / Applicants]
+   *     summary: Reject an applicant
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/ApplicantActionInput'
+   *       }
+   */
   @Post("/:id/reject")
   @ResponseSchema(Applicant)
   async reject(@Param("id") id: string, @Body() body: ApplicantActionInput): Promise<Applicant> {
@@ -105,6 +161,23 @@ export class ApplicantController {
    *   post:
    *     tags: [Admin / Applicants]
    *     summary: Convert an approved applicant into an Ambassador + login User
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required: [password]
+   *             properties:
+   *               password: { type: string }
+   *               name: { type: string }
+   *               email: { type: string }
+   *               phone: { type: string }
+   *               college: { type: string }
+   *               city: { type: string }
+   *               state: { type: string }
+   *               commissionPct: { type: integer }
+   *       }
    */
   @Post("/:id/convert")
   @ResponseSchema(Ambassador)

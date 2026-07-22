@@ -44,6 +44,13 @@ export class AmbassadorController {
    *     tags: [Admin / Directory]
    *     summary: Master leaderboard ranked by revenue
    */
+  /**
+   * @openapi
+   * /admin/ambassadors/leaderboard:
+   *   get:
+   *     tags: [Admin / Directory]
+   *     summary: Master leaderboard ranked by revenue
+   */
   @Get("/leaderboard")
   @ResponseSchema(Ambassador, { isArray: true })
   async leaderboard(@QueryParam("state") state?: string): Promise<ApiList<Ambassador>> {
@@ -56,12 +63,38 @@ export class AmbassadorController {
     return this.service.getById(id);
   }
 
+  /**
+   * @openapi
+   * /admin/ambassadors/{id}:
+   *   put:
+   *     tags: [Admin / Directory]
+   *     summary: Update ambassador profile or settings
+   */
   @Put("/:id")
   @ResponseSchema(Ambassador)
   async update(@Param("id") id: string, @Body() body: UpdateAmbassadorInput): Promise<Ambassador> {
     return this.service.update(id, body);
   }
 
+  /**
+   * @openapi
+   * /admin/ambassadors/{id}/inbox:
+   *   post:
+   *     tags: [Admin / Directory]
+   *     summary: Send a message to an ambassador's inbox
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required: [from, subject, body]
+   *             properties:
+   *               from: { type: string }
+   *               subject: { type: string }
+   *               body: { type: string }
+   *       }
+   */
   @Post("/:id/inbox")
   @ResponseSchema(InboxMessage)
   async sendMessage(@Param("id") ambassadorId: string, @Body() body: { from: string; subject: string; body: string }): Promise<InboxMessage> {

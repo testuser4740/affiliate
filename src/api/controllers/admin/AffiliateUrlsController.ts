@@ -27,6 +27,13 @@ export class AffiliateUrlController {
   @Inject()
   private service!: AffiliateUrlService;
 
+  /**
+   * @openapi
+   * /admin/affiliate-urls:
+   *   get:
+   *     tags: [Admin / Affiliate URLs]
+   *     summary: List affiliate URLs
+   */
   @Get("/")
   @ResponseSchema(AffiliateUrl, { isArray: true })
   async list(
@@ -43,12 +50,40 @@ export class AffiliateUrlController {
     return this.service.getById(id);
   }
 
+  /**
+   * @openapi
+   * /admin/affiliate-urls:
+   *   post:
+   *     tags: [Admin / Affiliate URLs]
+   *     summary: Create an affiliate URL
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/CreateAffiliateUrlInput'
+   *       }
+   */
   @Post("/")
   @ResponseSchema(AffiliateUrl)
   async create(@Body() body: CreateAffiliateUrlInput): Promise<AffiliateUrl> {
     return this.service.create(body);
   }
 
+  /**
+   * @openapi
+   * /admin/affiliate-urls/{id}:
+   *   put:
+   *     tags: [Admin / Affiliate URLs]
+   *     summary: Update an affiliate URL
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateAffiliateUrlInput'
+   *       }
+   */
   @Put("/:id")
   @ResponseSchema(AffiliateUrl)
   async update(@Param("id") id: string, @Body() body: UpdateAffiliateUrlInput): Promise<AffiliateUrl> {
