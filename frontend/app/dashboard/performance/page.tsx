@@ -44,8 +44,8 @@ export default function Performance() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState("All");
 
-  const commissionHistory = useBackend(() => backend.ambassadorHome(ambId).then(r => r.recentOrders ?? []), [], [ambId], ["commission"]);
-  const urls = useBackend(() => backend.ambassadorHome(ambId).then(r => r.urls ?? []), [], [ambId], ["leaderboard", "orders", "affiliate_urls"]);
+  const commissionHistory = useBackend(() => backend.ambassadorHome(ambId).then(r => r.recentOrders ?? []), [], [ambId], ["commission"], ambId);
+  const urls = useBackend(() => backend.ambassadorHome(ambId).then(r => r.urls ?? []), [], [ambId], ["leaderboard", "orders", "affiliate_urls"], ambId);
 
   const filtered = commissionHistory
     .filter(o => filter === "All" || o.status === filter)

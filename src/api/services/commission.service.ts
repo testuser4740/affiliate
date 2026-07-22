@@ -93,24 +93,41 @@ export class CommissionService {
     return resolveTier(Number(ambassador.revenue ?? 0)).commission;
   }
 
-  /** Finds a currently-valid override for a tier; expires stale ones automatically. */
+  /** Finds a currently-valid override for a tier based on date window. */
   private async activeOverrideFor(tierName: string) {
     const now = new Date();
-    const override = await this.commissionOverrideRepository.repository.findOne({
-      where: { appliesTo: tierName, status: "Active" },
+    const overrides = await this.commissionOverrideRepository.repository.find({
+      where: { appliesTo: tierName },
+      order: { startDate: "DESC" },
     });
-    if (!override) return null;
 
-    const started = !override.startDate || new Date(override.startDate) <= now;
-    const notEnded = !override.endDate || new Date(override.endDate) >= now;
-    if (started && notEnded) return override;
-
-    // Past its end date → revert to default by expiring it.
-    if (!notEnded) {
-      override.status = "Expired";
-      await this.commissionOverrideRepository.repository.save(override);
+    let activeOverride = null;
+    for (const override of overrides) {
+      const start = new Date(override.startDate);
+      const end = new Date(override.endDate);
+      if (now < start) {
+        if (override.status !== "Scheduled") {
+          override.status = "Scheduled";
+          await this.commissionOverrideRepository.repository.save(override);
+        }
+        activeOverride = override;
+        break;
+      } else if (now >= start && now <= end) {
+        if (override.status !== "Active") {
+          override.status = "Active";
+          await this.commissionOverrideRepository.repository.save(override);
+        }
+        activeOverride = override;
+        break;
+      } else {
+        if (override.status !== "Expired") {
+          override.status = "Expired";
+          await this.commissionOverrideRepository.repository.save(override);
+        }
+      }
     }
-    return null;
+
+    return activeOverride;
   }
 
   /** Recomputes revenue, orders, tier FK and commissionPct for an ambassador. */

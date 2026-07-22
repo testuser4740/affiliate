@@ -14,7 +14,7 @@ export default function Support() {
   const { user } = useAuth();
   const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
   const pocs = useBackend(() => get("/admin/pocs").then(r => (r as any).data), [], [], ["pocs"]);
-  const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission"]);
+  const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission"], ambId);
   const myPocs = pocs.filter(p => p.linkedAffiliates.includes(ambassador?.name ?? ""));
   const others = pocs.filter(p => !p.linkedAffiliates.includes(ambassador?.name ?? ""));
   return (

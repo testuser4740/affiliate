@@ -18,7 +18,7 @@ export default function Payouts() {
   const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
   const [filter, setFilter] = useState("All months");
 
-  const payouts = useBackend(() => backend.ambassadorPayouts(ambId), [], [ambId], ["commission", "orders"]);
+  const payouts = useBackend(() => backend.ambassadorPayouts(ambId), [], [ambId], ["commission", "orders"], ambId);
   const months = ["All months", ...Array.from(new Set(payouts.map(p => p.month)))];
   const labelOf = (m) => {
     if (m === "All months") return m;
@@ -26,7 +26,7 @@ export default function Payouts() {
     return new Date(parseInt(y), parseInt(mm)-1).toLocaleString("en-US", { month: "short", year: "numeric" });
   };
 
-  const stats = useBackend(() => backend.ambassadorHome(ambId).then(r => r.stats), null, [ambId], ["commission", "orders"]);
+  const stats = useBackend(() => backend.ambassadorHome(ambId).then(r => r.stats), null, [ambId], ["commission", "orders"], ambId);
   const pendingPayout = stats?.pendingCommission ?? 0;
   const paidOut = stats?.paidCommission ?? 0;
 

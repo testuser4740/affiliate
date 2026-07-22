@@ -12,7 +12,7 @@ const priorityClr = { High: "bg-[#FEE2E2] text-[#991B1B]", Medium: "bg-[#FEF3C7]
 export default function Announcements() {
   const { user } = useAuth();
   const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
-  const announcements = useBackend(() => backend.ambassadorAnnouncements(ambId), [], [ambId], ["announcements"]);
+  const announcements = useBackend(() => backend.ambassadorAnnouncements(ambId), [], [ambId], ["announcements"], ambId);
   return (
     <div className="space-y-5">
       <div>

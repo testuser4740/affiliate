@@ -29,15 +29,15 @@ export default function AdminAnnouncements() {
     if (!form.title) { toast.error("Title required"); return; }
     try {
       const payload: any = { ...form };
-      if (form.audience !== "Specific city") delete payload.city;
-      if (form.audience !== "Specific state") delete payload.state;
-      if (!["Gold + Platinum tiers", "Silver tier", "Bronze tier"].includes(form.audience)) delete payload.tier;
+      if (!payload.tier) delete payload.tier;
+      if (!payload.city) delete payload.city;
+      if (!payload.state) delete payload.state;
       
       if (editing) {
-        await backend.put(`/admin/announcements/${editing.id}`, payload);
+        await backend.updateAnnouncement(editing.id, payload);
         toast.success(`Announcement \"${form.title}\" updated`);
       } else {
-        await backend.post("/admin/announcements", payload);
+        await backend.createAnnouncement(payload);
         toast.success(`Announcement sent to ${form.audience}`);
       }
       setOpen(false);
@@ -48,7 +48,7 @@ export default function AdminAnnouncements() {
 
   const del = async (a) => {
     try {
-      await backend.del(`/admin/announcements/${a.id}`);
+      await backend.deleteAnnouncement(a.id);
       toast.success(`Deleted \"${a.title}\"`);
     } catch (err) {
       toast.error("Failed to delete announcement");

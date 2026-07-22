@@ -12,7 +12,7 @@ const DEMO_AMB_ID = "amb_005";
 export default function TierPage() {
   const { user } = useAuth();
   const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
-  const tierData = useBackend(() => backend.ambassadorTier(ambId), null, [ambId], ["leaderboard", "orders", "commission"]);
+  const tierData = useBackend(() => backend.ambassadorTier(ambId), null, [ambId], ["leaderboard", "orders", "commission"], ambId);
   const currentRevenue = tierData?.ambassador?.revenue ?? 0;
   const currentIdx = tiers.findIndex(t => currentRevenue >= t.min && currentRevenue < t.max);
 

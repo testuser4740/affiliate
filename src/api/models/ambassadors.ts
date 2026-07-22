@@ -13,8 +13,8 @@ import { Tier } from "./tiers";
 export type TierLevel = "Bronze" | "Silver" | "Gold" | "Platinum";
 
 export const TIER_THRESHOLDS = [
-  { level: "Platinum" as TierLevel, minRevenue: 150000, commission: 15 },
-  { level: "Gold" as TierLevel, minRevenue: 100000, commission: 12 },
+  { level: "Platinum" as TierLevel, minRevenue: 400000, commission: 15 },
+  { level: "Gold" as TierLevel, minRevenue: 150000, commission: 12 },
   { level: "Silver" as TierLevel, minRevenue: 50000, commission: 10 },
   { level: "Bronze" as TierLevel, minRevenue: 0, commission: 8 },
 ];

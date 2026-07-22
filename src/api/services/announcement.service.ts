@@ -37,17 +37,22 @@ export class AnnouncementService {
       title: input.title,
       body: input.body ?? "",
       audience: input.audience ?? "All Ambassadors",
-      tier: input.tier ?? null,
-      city: input.city ?? null,
-      state: input.state ?? null,
+      tier: input.tier || null,
+      city: input.city || null,
+      state: input.state || null,
       priority: input.priority ?? "Medium",
       sendToAmbassadors: true,
       sentOn: new Date(),
     } as Partial<Announcement>);
     this.log.info(`Announcement created: ${item.title}`);
-    const saved = await this.repository.repository.save(item);
-    liveBus.broadcast({ type: "announcements" });
-    return saved;
+    try {
+      const saved = await this.repository.repository.save(item);
+      try { liveBus.broadcast({ type: "announcements" }); } catch (e) { /* broadcast must not fail the request */ }
+      return saved;
+    } catch (err) {
+      this.log.error("Announcement save failed", err);
+      throw err;
+    }
   }
 
   async update(id: string, input: UpdateAnnouncementInput): Promise<Announcement> {
@@ -73,32 +78,42 @@ export class AnnouncementService {
   async getForAmbassador(ambassadorId: string): Promise<Announcement[]> {
     const ambassador = await this.ambassadorService.getById(ambassadorId);
     const tierName = ambassador.tier?.name;
-    
+
     const repo = this.repository.repository;
     const qb = repo.createQueryBuilder("announcement");
-    
-    const conditions: string[] = ["announcement.audience = 'All Ambassadors'"];
-    const params: Record<string, unknown> = {};
-    
-    if (tierName === "Gold" || tierName === "Platinum") {
-      conditions.push("announcement.audience = 'Gold + Platinum tiers'");
-    } else if (tierName === "Silver") {
-      conditions.push("announcement.audience = 'Silver tier'");
-    } else if (tierName === "Bronze") {
-      conditions.push("announcement.audience = 'Bronze tier'");
+
+    const tierAudience =
+      tierName === "Gold" || tierName === "Platinum"
+        ? "Gold + Platinum tiers"
+        : tierName === "Silver"
+        ? "Silver tier"
+        : tierName === "Bronze"
+        ? "Bronze tier"
+        : undefined;
+
+    const whereClauses = ["announcement.audience = :allAudience"];
+    const params: Record<string, unknown> = { allAudience: "All Ambassadors" };
+
+    if (tierAudience) {
+      whereClauses.push("announcement.audience = :tierAudience");
+      params.tierAudience = tierAudience;
     }
-    
+
     if (ambassador.city) {
-      conditions.push("(announcement.audience = 'Specific city' AND announcement.city = :city)");
+      whereClauses.push(
+        "(announcement.audience = 'Specific city' AND announcement.city = :city)"
+      );
       params.city = ambassador.city;
     }
-    
+
     if (ambassador.state) {
-      conditions.push("(announcement.audience = 'Specific state' AND announcement.state = :state)");
+      whereClauses.push(
+        "(announcement.audience = 'Specific state' AND announcement.state = :state)"
+      );
       params.state = ambassador.state;
     }
-    
-    qb.where(`(${conditions.join(" OR ")})`, params);
+
+    qb.where(`(${whereClauses.join(" OR ")})`, params);
     qb.orderBy("announcement.sentOn", "DESC");
     return qb.getMany();
   }

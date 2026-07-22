@@ -10,7 +10,7 @@ import { authorizationChecker } from '../auth/authorizationChecker';
 import { currentUserChecker } from '../auth/currentUserChecker';
 import { env } from '../env';
 import { swaggerSchemas } from '../api/swagger-schemas';
-import { liveBus } from '../api/lib/eventBus';
+import { liveBus, connectionManager } from '../api/lib/eventBus';
 
 export const expressLoader: MicroframeworkLoader = async (settings: MicroframeworkSettings | undefined) => {
     if (!settings) {
@@ -60,7 +60,19 @@ export const expressLoader: MicroframeworkLoader = async (settings: Microframewo
 
         send('connected', { ok: true });
 
-        const onLive = (event: unknown) => send((event as any).type, event);
+        const ambassadorId = (req as any).query?.ambassadorId as string | undefined;
+        const remove = connectionManager.add({
+            ambassadorId,
+            listener: (event: unknown) => send((event as any).type, event),
+        });
+
+        const onLive = (event: unknown) => {
+            const typed = event as any;
+            if (typed?.type === 'inbox') {
+                if (typed.ambassadorId && typed.ambassadorId !== ambassadorId) return;
+            }
+            send(typed?.type, event);
+        };
         liveBus.on('live', onLive);
 
         const ping = setInterval(() => send('ping', {}), 25_000);
@@ -68,6 +80,7 @@ export const expressLoader: MicroframeworkLoader = async (settings: Microframewo
         const cleanup = () => {
             clearInterval(ping);
             liveBus.off('live', onLive);
+            remove();
         };
         res.on('close', cleanup);
         res.on('finish', cleanup);

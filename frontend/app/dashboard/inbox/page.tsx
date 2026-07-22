@@ -12,7 +12,7 @@ export default function Inbox() {
   const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
   const [sel, setSel] = useState(null);
   const [q, setQ] = useState("");
-  const inboxMessages = useBackend(() => backend.ambassadorInbox(ambId), [], [ambId], ["inbox", "ambassador_created", "pocs", "announcements", "tasks"]);
+  const inboxMessages = useBackend(() => backend.ambassadorInbox(ambId), [], [ambId], ["inbox", "ambassador_created", "pocs", "announcements", "tasks"], ambId);
   const filtered = inboxMessages.filter(m => (m.from + m.subject + (m.preview || m.body || "")).toLowerCase().includes(q.toLowerCase()));
 
   // Mark message as read when opened

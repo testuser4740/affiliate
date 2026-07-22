@@ -93,7 +93,7 @@ async function seed(): Promise<void> {
     ];
     const ambRepo = db.getRepository(Ambassador);
     const ambassadors = leaderboard.map((l, i) => {
-        const tierName = l.revenue >= 150000 ? 'Platinum' : l.revenue >= 100000 ? 'Gold' : l.revenue >= 50000 ? 'Silver' : 'Bronze';
+        const tierName = l.revenue >= 400000 ? 'Platinum' : l.revenue >= 150000 ? 'Gold' : l.revenue >= 50000 ? 'Silver' : 'Bronze';
         const commissionPct = tierName === 'Platinum' ? 15 : tierName === 'Gold' ? 12 : tierName === 'Silver' ? 10 : 8;
         return ambRepo.create({
             id: `amb_${String(i + 1).padStart(3, '0')}`,

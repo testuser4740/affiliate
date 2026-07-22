@@ -35,11 +35,11 @@ export default function AmbassadorLayout({ children }) {
   const [menu, setMenu] = useState(false);
   const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
 
-  const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission", "ambassador_created"]);
-  const inboxMessages = useBackend(() => backend.ambassadorInbox(ambId), [], [ambId], ["inbox", "ambassador_created", "pocs", "announcements", "tasks"]);
+  const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission", "ambassador_created"], ambId);
+  const inboxMessages = useBackend(() => backend.ambassadorInbox(ambId), [], [ambId], ["inbox", "ambassador_created", "pocs", "announcements", "tasks"], ambId);
 
   const unread = inboxMessages.filter(m=>!m.read).length;
-  const tier = tiers.find(t => t.name === (ambassador?.tier ?? "Bronze")) || tiers[0];
+  const tier = tiers.find(t => t.name === (ambassador?.tier?.name ?? "Bronze")) || tiers[0];
   const inTop10 = (ambassador?.rank ?? 0) <= 10;
 
   // Role-based guard: only ambassadors may access the dashboard.
@@ -96,7 +96,7 @@ export default function AmbassadorLayout({ children }) {
               <img src={ambAvatar} alt="" className={`w-8 h-8 rounded-full object-cover flex-shrink-0 ${inTop10 ? "ring-2 ring-[#FFC93C]" : "ring-2 ring-[#F26B1F]/30"}`} />
               <div className="text-left min-w-0 hidden sm:block">
                 <p className="font-bold text-sm leading-tight truncate text-[#1B2D54]">{ambName}</p>
-                <p className="text-[10px] text-[#5A6378] truncate">Rank #{ambRank} • {ambassador?.tier ?? "Bronze"}</p>
+                <p className="text-[10px] text-[#5A6378] truncate">Rank #{ambRank} • {ambassador?.tier?.name ?? "Bronze"}</p>
               </div>
               <span className="w-8 h-8 grid place-items-center rounded-full ml-1 flex-shrink-0" data-testid="amb-hamburger"><Menu className="w-5 h-5 text-[#1B2D54]" /></span>
             </button>

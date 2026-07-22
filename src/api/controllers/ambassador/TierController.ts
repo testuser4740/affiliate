@@ -28,7 +28,7 @@ export class AmbassadorTierController {
    */
   @Get("/:ambassadorId/tier")
   async tier(@Param("ambassadorId") ambassadorId: string) {
-    const ambassador = await this.ambassadors.getById(ambassadorId);
+    const ambassador = await this.ambassadors.recalculateTier(ambassadorId);
     const allTiers = await this.tiers.list();
     const { current, next, progressToNext } = this.tiers.resolveProgression(
       Number(ambassador.revenue ?? 0),

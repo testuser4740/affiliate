@@ -1,6 +1,6 @@
 import { Service } from "typedi";
 import { Logger, LoggerInterface } from "../../decorators/Logger";
-import { Ambassador } from "../models/ambassadors";
+import { Ambassador, resolveTier } from "../models/ambassadors";
 import { Tier } from "../models/tiers";
 import { AmbassadorRepository } from "../repositories/AmbassadorRepository";
 import { TierRepository } from "../repositories/TierRepository";
@@ -42,7 +42,10 @@ export class AmbassadorService {
   }
 
   async getById(id: string): Promise<Ambassador> {
-    const ambassador = await this.repository.repository.findOne({ where: { id } });
+    const ambassador = await this.repository.repository.findOne({ 
+      where: { id },
+      relations: ["tier"]
+    });
     if (!ambassador) throw new NotFoundError(`Ambassador ${id} not found`);
     return ambassador;
   }
@@ -59,6 +62,15 @@ export class AmbassadorService {
     const saved = await repo.save(ambassador);
     liveBus.broadcast({ type: "leaderboard" });
     return saved;
+  }
+
+  async recalculateTier(id: string): Promise<Ambassador> {
+    const ambassador = await this.getById(id);
+    const tierInfo = resolveTier(Number(ambassador.revenue ?? 0));
+    const tierRecord = await this.tierRepository.repository.findOne({ where: { name: tierInfo.level } });
+    ambassador.tier = tierRecord ?? null;
+    ambassador.commissionPct = tierInfo.commission;
+    return this.repository.repository.save(ambassador);
   }
 
   async leaderboard(state?: string): Promise<{ data: Ambassador[]; total: number }> {

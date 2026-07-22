@@ -24,11 +24,11 @@ export class TierService {
     progressToNext: number;
     allTiers: Tier[];
   } {
-    const matched = tiers.find((t) => Number(t.min) <= revenue && revenue <= Number(t.max));
-    const current = matched ?? tiers[0];
-    const next = tiers.find((t) => Number(t.min) > revenue) ?? null;
-
     const revenueNum = Number(revenue ?? 0);
+    const matched = tiers.find((t) => Number(t.min) <= revenueNum && revenueNum < Number(t.max));
+    const current = matched ?? tiers[tiers.length - 1];
+    const next = tiers.find((t) => Number(t.min) > revenueNum) ?? null;
+
     const progress = current
       ? Math.min(
           100,

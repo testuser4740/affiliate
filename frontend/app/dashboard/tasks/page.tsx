@@ -19,7 +19,7 @@ export default function Tasks() {
   const [openId, setOpenId] = useState(null);
   const [proof, setProof] = useState("");
 
-  const tasks = useBackend(() => backend.listTasks(ambId), [], [ambId], ["tasks"]);
+  const tasks = useBackend(() => backend.listTasks(ambId), [], [ambId], ["tasks"], ambId);
   const filtered = tasks.filter(t => t.status === active);
   const submit = (id) => {
     if (!proof.trim()) { toast.error("Add a link or note"); return; }

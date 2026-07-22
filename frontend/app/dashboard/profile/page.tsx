@@ -19,8 +19,8 @@ const Field = ({ label, value, type = "text" }) => (
 export default function Profile() {
   const { user } = useAuth();
   const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
-  const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission"]);
-  const tier = tiers.find(t => t.name === (ambassador?.tier ?? "Bronze")) || tiers[0];
+  const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission"], ambId);
+  const tier = tiers.find(t => t.name === (ambassador?.tier?.name ?? "Bronze")) || tiers[0];
   return (
     <div className="space-y-5">
       <div>

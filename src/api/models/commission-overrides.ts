@@ -30,25 +30,22 @@ export class CommissionOverride {
   @Column({ name: "end_date", type: "date" })
   endDate: Date;
 
-  @Column({ name: "expires_at", type: "timestamp", nullable: true })
-  expiresAt: Date;
-
-  @Column({ type: "varchar", length: 32, default: "Scheduled" })
+  @Column({ type: "varchar", length: 32 })
   status: string;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-@BeforeInsert()
-    async generateId(): Promise<void> {
-      if (this.id) {
-        return;
-      }
-      const count = await (
-        (this as unknown as { constructor: { getRepository?: () => unknown } })
-          .constructor as { getRepository?: () => { count: (opts: unknown) => Promise<number> } }
-      ).getRepository?.()?.count({ where: { id: Like(`CO-%`) } }) ?? 0;
-      const sequence = ((count ?? 0) + 1).toString().padStart(3, "0");
-      this.id = `CO-${sequence}`;
+  @BeforeInsert()
+  async generateId(): Promise<void> {
+    if (this.id) {
+      return;
     }
+    const count = await (
+      (this as unknown as { constructor: { getRepository?: () => unknown } })
+        .constructor as { getRepository?: () => { count: (opts: unknown) => Promise<number> } }
+    ).getRepository?.()?.count({ where: { id: Like(`CO-%`) } }) ?? 0;
+    const sequence = ((count ?? 0) + 1).toString().padStart(3, "0");
+    this.id = `CO-${sequence}`;
+  }
 }

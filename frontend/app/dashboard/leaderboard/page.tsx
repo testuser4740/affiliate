@@ -29,7 +29,7 @@ export default function Leaderboard() {
   const firedRef = useRef(false);
 
   const leaderboard = useBackend(() => backend.publicLeaderboard().then(r => r), [], [], ["leaderboard", "orders", "commission", "ambassador_created"]);
-  const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission"]);
+  const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission"], ambId);
 
   const ambState = ambassador?.state ?? "";
   const ambCity = ambassador?.city ?? "";

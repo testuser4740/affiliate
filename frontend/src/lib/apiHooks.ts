@@ -1,6 +1,8 @@
 // Typed accessors for the Gajab backend API.
 // Each returns the raw backend shape; pages fall back to mockData on error.
-import { api, get, post, ApiList } from "./api";
+import { api, get, post, put, del, ApiList } from "./api";
+import { CreateCommissionOverrideInput, UpdateCommissionOverrideInput } from "./dto/commission-override.dto";
+import { CreateAnnouncementInput, UpdateAnnouncementInput } from "./dto/announcement.dto";
 
 export interface Applicant {
   id: string;
@@ -54,6 +56,17 @@ export interface InboxMessage {
   receivedOn: string;
   read: boolean;
   priority: string;
+}
+
+export interface CommissionOverride {
+  id: string;
+  label: string;
+  appliesTo: string;
+  originalPct: number;
+  overridePct: number;
+  startDate: string;
+  endDate: string;
+  status: string;
 }
 
 export interface Payout {
@@ -133,6 +146,20 @@ export const backend = {
   analyticsTrend: () => get<any[]>("/admin/analytics/trend"),
   listAnnouncements: (audience?: string, priority?: string) =>
     get<ApiList<Announcement>>("/admin/announcements", { audience, priority }),
+  createAnnouncement: (body: CreateAnnouncementInput) =>
+    post<Announcement>("/admin/announcements", body),
+  updateAnnouncement: (id: string, body: UpdateAnnouncementInput) =>
+    put<Announcement>(`/admin/announcements/${id}`, body),
+  deleteAnnouncement: (id: string) =>
+    del<void>(`/admin/announcements/${id}`),
+  listCommissionOverrides: (status?: string, q?: string) =>
+    get<ApiList<CommissionOverride>>("/admin/commission-overrides", { status, q }),
+  createCommissionOverride: (body: CreateCommissionOverrideInput) =>
+    post<CommissionOverride>("/admin/commission-overrides", body),
+  updateCommissionOverride: (id: string, body: UpdateCommissionOverrideInput) =>
+    put<CommissionOverride>(`/admin/commission-overrides/${id}`, body),
+  deleteCommissionOverride: (id: string) =>
+    del<void>(`/admin/commission-overrides/${id}`),
   listAffiliateUrls: (ambassadorId?: string, channel?: string, q?: string) =>
     get<ApiList<AffiliateUrl>>("/admin/affiliate-urls", { ambassadorId, channel, q }),
 

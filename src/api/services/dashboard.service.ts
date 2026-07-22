@@ -18,7 +18,10 @@ export class DashboardService {
   ) {}
 
   async home(ambassadorId: string) {
-    const ambassador = await this.ambassadorRepository.repository.findOne({ where: { id: ambassadorId } });
+    const ambassador = await this.ambassadorRepository.repository.findOne({ 
+      where: { id: ambassadorId },
+      relations: ["tier"]
+    });
     if (!ambassador) throw new NotFoundError(`Ambassador ${ambassadorId} not found`);
 
     const urls = await this.affiliateUrlRepository.repository.find({

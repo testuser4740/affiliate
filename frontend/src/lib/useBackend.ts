@@ -10,6 +10,7 @@ export function useBackend<T>(
   fallback: T,
   deps: unknown[] = [],
   liveEvents?: LiveEventType[],
+  ambassadorId?: string,
 ): T {
   const [data, setData] = useState<T>(fallback);
   const [tick, setTick] = useState(0);
@@ -34,7 +35,7 @@ export function useBackend<T>(
     if (liveEvents && liveEvents.includes(event.type)) {
       setTick((t) => t + 1);
     }
-  }, Boolean(liveEvents));
+  }, Boolean(liveEvents), ambassadorId);
 
   return data;
 }

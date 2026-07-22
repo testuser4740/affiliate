@@ -27,6 +27,9 @@ export class Announcement {
   @Column({ type: "varchar", length: 64, nullable: true })
   city: string | null;
 
+  @Column({ type: "varchar", length: 64, nullable: true })
+  state: string | null;
+
   @Column({ name: "sent_on", type: "timestamp", nullable: true })
   sentOn: Date;
 
@@ -50,11 +53,8 @@ export class Announcement {
     if (this.id) {
       return;
     }
-    const count = await (
-      (this as unknown as { constructor: { getRepository?: () => unknown } })
-        .constructor as { getRepository?: () => { count: (opts: unknown) => Promise<number> } }
-    ).getRepository?.()?.count({ where: { id: Like(`ANN-%`) } });
-    const sequence = ((count ?? 0) + 1).toString().padStart(3, "0");
-    this.id = `ANN-${sequence}`;
+    const ts = Date.now().toString(36);
+    const rand = Math.floor(Math.random() * 36).toString(36);
+    this.id = `ANN-${ts}${rand}`.slice(0, 32);
   }
 }

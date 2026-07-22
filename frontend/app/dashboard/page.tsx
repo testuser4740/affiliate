@@ -34,6 +34,7 @@ export default function Home() {
     null,
     [ambId],
     ["leaderboard", "orders", "commission", "ambassador_created"],
+    ambId,
   );
   const ambassador = home?.ambassador ?? null;
   const stats = home?.stats ?? null;

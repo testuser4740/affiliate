@@ -32,13 +32,17 @@ export interface LiveEvent {
 export function useEventStream(
   onEvent: (event: LiveEvent) => void,
   enabled: boolean = true,
+  ambassadorId?: string,
 ): void {
   const cbRef = useRef(onEvent);
   cbRef.current = onEvent;
 
   useEffect(() => {
     if (!enabled) return;
-    const es = new EventSource(`${API_BASE_URL}/stream`);
+    const url = ambassadorId
+      ? `${API_BASE_URL}/stream?ambassadorId=${encodeURIComponent(ambassadorId)}`
+      : `${API_BASE_URL}/stream`;
+    const es = new EventSource(url);
 
     es.onmessage = (msg) => {
       // Default message event (no `event:` field) — ignore; we use named events.

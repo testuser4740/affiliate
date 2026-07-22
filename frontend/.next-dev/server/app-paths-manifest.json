@@ -1,8 +1,19 @@
 {
-  "/dashboard/inbox/page": "app/dashboard/inbox/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
   "/admin/applicants/page": "app/admin/applicants/page.js",
   "/admin/directory/page": "app/admin/directory/page.js",
-  "/dashboard/announcements/page": "app/dashboard/announcements/page.js",
+  "/dashboard/inbox/page": "app/dashboard/inbox/page.js",
+  "/dashboard/tier/page": "app/dashboard/tier/page.js",
+  "/dashboard/performance/page": "app/dashboard/performance/page.js",
+  "/dashboard/tasks/page": "app/dashboard/tasks/page.js",
   "/dashboard/leaderboard/page": "app/dashboard/leaderboard/page.js",
-  "/admin/announcements/page": "app/admin/announcements/page.js"
+  "/dashboard/payouts/page": "app/dashboard/payouts/page.js",
+  "/dashboard/announcements/page": "app/dashboard/announcements/page.js",
+  "/admin/affiliate-urls/page": "app/admin/affiliate-urls/page.js",
+  "/admin/tasks/page": "app/admin/tasks/page.js",
+  "/admin/leaderboard/page": "app/admin/leaderboard/page.js",
+  "/admin/utilization/page": "app/admin/utilization/page.js",
+  "/admin/announcements/page": "app/admin/announcements/page.js",
+  "/admin/support/page": "app/admin/support/page.js",
+  "/admin/analytics/page": "app/admin/analytics/page.js"
 }
