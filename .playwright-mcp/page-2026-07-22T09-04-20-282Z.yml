@@ -1,0 +1,328 @@
+- generic [ref=f16e1]:
+  - region "Notifications alt+T"
+  - generic [ref=f16e2]:
+    - complementary [ref=f16e3]:
+      - generic [ref=f16e4]:
+        - img "Gajab Ambassadors" [ref=f16e5]
+        - generic [ref=f16e6]: Gajab.
+      - generic [ref=f16e8]:
+        - generic [ref=f16e9]: ADMIN CONSOLE
+        - button "V1 V2" [ref=f16e10] [cursor=pointer]:
+          - generic [ref=f16e11]: V1
+          - generic [ref=f16e12]: V2
+      - navigation [ref=f16e13]:
+        - link "Applicants" [ref=f16e14] [cursor=pointer]:
+          - /url: /admin/applicants
+        - link "Directory" [ref=f16e19] [cursor=pointer]:
+          - /url: /admin/directory
+        - link "Affiliate URLs" [ref=f16e25] [cursor=pointer]:
+          - /url: /admin/affiliate-urls
+        - link "Tasks" [ref=f16e29] [cursor=pointer]:
+          - /url: /admin/tasks
+        - link "Leaderboard" [ref=f16e33] [cursor=pointer]:
+          - /url: /admin/leaderboard
+        - link "Commissions" [ref=f16e40] [cursor=pointer]:
+          - /url: /admin/utilization
+        - link "Announcements" [ref=f16e43] [cursor=pointer]:
+          - /url: /admin/announcements
+        - link "Support" [ref=f16e47] [cursor=pointer]:
+          - /url: /admin/support
+        - link "Analytics" [ref=f16e50] [cursor=pointer]:
+          - /url: /admin/analytics
+      - button "Exit Admin" [ref=f16e53] [cursor=pointer]
+    - main [ref=f16e57]:
+      - generic [ref=f16e59]:
+        - generic [ref=f16e60]:
+          - generic [ref=f16e61]: Commissions
+          - heading "Commissions & order utilization" [level=1] [ref=f16e62]
+          - paragraph [ref=f16e63]: Set base commission rates, run boost campaigns, and track every referral order.
+        - generic [ref=f16e64]:
+          - generic [ref=f16e65]:
+            - generic [ref=f16e66]:
+              - heading "Commission overrides" [level=3] [ref=f16e67]
+              - paragraph [ref=f16e72]: Boost commission for specific campaigns & periods. Overrides apply automatically to qualifying orders.
+            - generic [ref=f16e73]:
+              - textbox "Search campaign, ID..." [ref=f16e78]
+              - combobox [ref=f16e79]:
+                - option "All statuses" [selected]
+                - option "Active"
+                - option "Scheduled"
+                - option "Expired"
+              - button "New Override" [active] [ref=f16e80] [cursor=pointer]
+          - table [ref=f16e83]:
+            - rowgroup [ref=f16e84]:
+              - row [ref=f16e85]:
+                - columnheader "ID" [ref=f16e86]
+                - columnheader "Campaign" [ref=f16e87]
+                - columnheader "Applies to" [ref=f16e88]
+                - columnheader "Original %" [ref=f16e89]
+                - columnheader "Override %" [ref=f16e90]
+                - columnheader "Start" [ref=f16e91]
+                - columnheader "End" [ref=f16e92]
+                - columnheader "Status" [ref=f16e93]
+                - columnheader [ref=f16e94]
+            - rowgroup [ref=f16e120]:
+              - row [ref=f16e121]:
+                - cell "CO-003" [ref=f16e122]
+                - cell "Republic Day Campaign" [ref=f16e123]
+                - cell "All ambassadors" [ref=f16e124]
+                - cell "10.00%" [ref=f16e125]
+                - cell "14.00%" [ref=f16e126]
+                - cell "2027-01-22" [ref=f16e128]
+                - cell "2027-01-31" [ref=f16e129]
+                - cell "Scheduled" [ref=f16e130]
+                - cell [ref=f16e132]:
+                  - generic [ref=f16e133]:
+                    - button [ref=f16e134] [cursor=pointer]
+                    - button [ref=f16e138] [cursor=pointer]
+              - row [ref=f16e142]:
+                - cell "CO-002" [ref=f16e143]
+                - cell "Year-End Mega Sale" [ref=f16e144]
+                - cell "Gold + Platinum tiers" [ref=f16e145]
+                - cell "12.00%" [ref=f16e146]
+                - cell "18.00%" [ref=f16e147]
+                - cell "2026-12-20" [ref=f16e149]
+                - cell "2027-01-05" [ref=f16e150]
+                - cell "Active" [ref=f16e151]
+                - cell [ref=f16e153]:
+                  - generic [ref=f16e154]:
+                    - button [ref=f16e155] [cursor=pointer]
+                    - button [ref=f16e159] [cursor=pointer]
+              - row [ref=f16e163]:
+                - cell "CO-001" [ref=f16e164]
+                - cell "Diwali Festive Boost" [ref=f16e165]
+                - cell "All ambassadors" [ref=f16e166]
+                - cell "10.00%" [ref=f16e167]
+                - cell "15.00%" [ref=f16e168]
+                - cell "2026-10-15" [ref=f16e170]
+                - cell "2026-11-10" [ref=f16e171]
+                - cell "Expired" [ref=f16e172]
+                - cell [ref=f16e174]:
+                  - generic [ref=f16e175]:
+                    - button [ref=f16e176] [cursor=pointer]
+                    - button [ref=f16e180] [cursor=pointer]
+              - row [ref=f16e184]:
+                - cell "CO-004" [ref=f16e185]
+                - cell "Default Date Test" [ref=f16e186]
+                - cell "All ambassadors" [ref=f16e187]
+                - cell "10.00%" [ref=f16e188]
+                - cell "20.00%" [ref=f16e189]
+                - cell "2026-07-22" [ref=f16e191]
+                - cell "2026-07-29" [ref=f16e192]
+                - cell "Scheduled" [ref=f16e193]
+                - cell [ref=f16e195]:
+                  - generic [ref=f16e196]:
+                    - button [ref=f16e197] [cursor=pointer]
+                    - button [ref=f16e201] [cursor=pointer]
+              - row [ref=f16e205]:
+                - cell "CO4-004" [ref=f16e206]
+                - cell "AADI" [ref=f16e207]
+                - cell "All ambassadors" [ref=f16e208]
+                - cell "0.00%" [ref=f16e209]
+                - cell "0.00%" [ref=f16e210]
+                - cell "2026-07-21" [ref=f16e212]
+                - cell "2026-07-22" [ref=f16e213]
+                - cell "Scheduled" [ref=f16e214]
+                - cell [ref=f16e216]:
+                  - generic [ref=f16e217]:
+                    - button [ref=f16e218] [cursor=pointer]
+                    - button [ref=f16e222] [cursor=pointer]
+        - generic [ref=f16e95]:
+          - generic [ref=f16e96]:
+            - generic [ref=f16e97]:
+              - heading "Order utilization log" [level=3] [ref=f16e98]
+              - paragraph [ref=f16e99]: Every order placed via a referral URL.
+            - generic [ref=f16e100]:
+              - textbox "Search code, order, customer..." [ref=f16e105]
+              - combobox [ref=f16e106]:
+                - option "All codes" [selected]
+                - option "https://gajab.com/r/YASHGUPTA"
+                - option "https://gajab.com/r/KABIRMALHOTRA"
+                - option "https://gajab.com/r/TESTUSER"
+                - option "https://gajab.com/r/SARAKHAN"
+                - option "https://gajab.com/r/POOJABANERJEE"
+                - option "https://gajab.com/r/ISHAANKAPOOR"
+                - option "https://gajab.com/r/AARAV-IITB"
+                - option "https://gajab.com/r/RIYA-DU24"
+                - option "https://gajab.com/r/SNEHA-VIT"
+                - option "https://gajab.com/r/AARAV-IITB?utm=insta"
+                - option "https://gajab.com/r/KARAN-DTU"
+                - option "https://gajab.com/r/RIYA-DU24?utm=wa"
+                - option "https://gajab.com/r/PRIYA-SXC"
+                - option "https://gajab.com/r/ROHAN-NITT"
+          - table [ref=f16e108]:
+            - rowgroup [ref=f16e109]:
+              - row [ref=f16e110]:
+                - columnheader "Code" [ref=f16e111]
+                - columnheader "Order ID" [ref=f16e112]
+                - columnheader "Customer" [ref=f16e113]
+                - columnheader "Order Value" [ref=f16e114]
+                - columnheader "Used at" [ref=f16e115]
+                - columnheader "Discount" [ref=f16e116]
+                - columnheader "Commission %" [ref=f16e117]
+                - columnheader "Commission ₹" [ref=f16e118]
+            - rowgroup [ref=f16e226]:
+              - row [ref=f16e227]:
+                - cell "https://gajab.com/r/YASHGUPTA" [ref=f16e228]
+                - cell "URL-amb_mrt16t94" [ref=f16e229]
+                - cell "Yash Gupta" [ref=f16e230]
+                - cell "₹0" [ref=f16e231]
+                - cell "2026-07-20T09:37:29.816Z" [ref=f16e232]
+                - cell "- ₹0" [ref=f16e233]
+                - cell "0%" [ref=f16e234]
+                - cell "₹0" [ref=f16e235]
+              - row [ref=f16e236]:
+                - cell "https://gajab.com/r/KABIRMALHOTRA" [ref=f16e237]
+                - cell "URL-amb_mruo19jy" [ref=f16e238]
+                - cell "Kabir Malhotra" [ref=f16e239]
+                - cell "₹0" [ref=f16e240]
+                - cell "2026-07-21T13:04:48.397Z" [ref=f16e241]
+                - cell "- ₹0" [ref=f16e242]
+                - cell "0%" [ref=f16e243]
+                - cell "₹0" [ref=f16e244]
+              - row [ref=f16e245]:
+                - cell "https://gajab.com/r/TESTUSER" [ref=f16e246]
+                - cell "URL-amb_mrt30urd" [ref=f16e247]
+                - cell "TestUser" [ref=f16e248]
+                - cell "₹0" [ref=f16e249]
+                - cell "2026-07-20T10:28:51.057Z" [ref=f16e250]
+                - cell "- ₹0" [ref=f16e251]
+                - cell "0%" [ref=f16e252]
+                - cell "₹0" [ref=f16e253]
+              - row [ref=f16e254]:
+                - cell "https://gajab.com/r/SARAKHAN" [ref=f16e255]
+                - cell "URL-amb_mrt2wibv" [ref=f16e256]
+                - cell "Sara Khan" [ref=f16e257]
+                - cell "₹0" [ref=f16e258]
+                - cell "2026-07-20T10:25:28.339Z" [ref=f16e259]
+                - cell "- ₹0" [ref=f16e260]
+                - cell "0%" [ref=f16e261]
+                - cell "₹0" [ref=f16e262]
+              - row [ref=f16e263]:
+                - cell "https://gajab.com/r/POOJABANERJEE" [ref=f16e264]
+                - cell "URL-amb_mrt1c9dy" [ref=f16e265]
+                - cell "Pooja Banerjee" [ref=f16e266]
+                - cell "₹0" [ref=f16e267]
+                - cell "2026-07-20T09:41:44.006Z" [ref=f16e268]
+                - cell "- ₹0" [ref=f16e269]
+                - cell "0%" [ref=f16e270]
+                - cell "₹0" [ref=f16e271]
+              - row [ref=f16e272]:
+                - cell "https://gajab.com/r/ISHAANKAPOOR" [ref=f16e273]
+                - cell "URL-amb_mrt18l77" [ref=f16e274]
+                - cell "Ishaan Kapoor" [ref=f16e275]
+                - cell "₹0" [ref=f16e276]
+                - cell "2026-07-20T09:38:52.689Z" [ref=f16e277]
+                - cell "- ₹0" [ref=f16e278]
+                - cell "0%" [ref=f16e279]
+                - cell "₹0" [ref=f16e280]
+              - row [ref=f16e281]:
+                - cell "https://gajab.com/r/AARAV-IITB" [ref=f16e282]
+                - cell "URL-A001" [ref=f16e283]
+                - cell "Aarav Mehta" [ref=f16e284]
+                - cell "₹684,200" [ref=f16e285]
+                - cell "2026-12-14T08:52:00.000Z" [ref=f16e286]
+                - cell "- ₹0" [ref=f16e287]
+                - cell "10%" [ref=f16e288]
+                - cell "₹68420" [ref=f16e289]
+              - row [ref=f16e290]:
+                - cell "https://gajab.com/r/RIYA-DU24" [ref=f16e291]
+                - cell "URL-A005" [ref=f16e292]
+                - cell "Riya Sharma" [ref=f16e293]
+                - cell "₹248,650" [ref=f16e294]
+                - cell "2026-12-14T08:44:00.000Z" [ref=f16e295]
+                - cell "- ₹0" [ref=f16e296]
+                - cell "10%" [ref=f16e297]
+                - cell "₹24865" [ref=f16e298]
+              - row [ref=f16e299]:
+                - cell "https://gajab.com/r/SNEHA-VIT" [ref=f16e300]
+                - cell "URL-A003" [ref=f16e301]
+                - cell "Sneha Iyer" [ref=f16e302]
+                - cell "₹612,400" [ref=f16e303]
+                - cell "2026-12-14T08:28:00.000Z" [ref=f16e304]
+                - cell "- ₹0" [ref=f16e305]
+                - cell "10%" [ref=f16e306]
+                - cell "₹61240" [ref=f16e307]
+              - row [ref=f16e308]:
+                - cell "https://gajab.com/r/AARAV-IITB?utm=insta" [ref=f16e309]
+                - cell "URL-A002" [ref=f16e310]
+                - cell "Aarav Mehta" [ref=f16e311]
+                - cell "₹312,400" [ref=f16e312]
+                - cell "2026-12-14T07:44:00.000Z" [ref=f16e313]
+                - cell "- ₹0" [ref=f16e314]
+                - cell "10%" [ref=f16e315]
+                - cell "₹31240" [ref=f16e316]
+              - row [ref=f16e317]:
+                - cell "https://gajab.com/r/KARAN-DTU" [ref=f16e318]
+                - cell "URL-A004" [ref=f16e319]
+                - cell "Karan Singh" [ref=f16e320]
+                - cell "₹548,900" [ref=f16e321]
+                - cell "2026-12-14T07:12:00.000Z" [ref=f16e322]
+                - cell "- ₹0" [ref=f16e323]
+                - cell "10%" [ref=f16e324]
+                - cell "₹54890" [ref=f16e325]
+              - row [ref=f16e326]:
+                - cell "https://gajab.com/r/RIYA-DU24?utm=wa" [ref=f16e327]
+                - cell "URL-A006" [ref=f16e328]
+                - cell "Riya Sharma" [ref=f16e329]
+                - cell "₹78,200" [ref=f16e330]
+                - cell "2026-12-14T05:32:00.000Z" [ref=f16e331]
+                - cell "- ₹0" [ref=f16e332]
+                - cell "10%" [ref=f16e333]
+                - cell "₹7820" [ref=f16e334]
+              - row [ref=f16e335]:
+                - cell "https://gajab.com/r/PRIYA-SXC" [ref=f16e336]
+                - cell "URL-A007" [ref=f16e337]
+                - cell "Priya Nair" [ref=f16e338]
+                - cell "₹482,300" [ref=f16e339]
+                - cell "2026-12-14T04:48:00.000Z" [ref=f16e340]
+                - cell "- ₹0" [ref=f16e341]
+                - cell "10%" [ref=f16e342]
+                - cell "₹48230" [ref=f16e343]
+              - row [ref=f16e344]:
+                - cell "https://gajab.com/r/ROHAN-NITT" [ref=f16e345]
+                - cell "URL-A008" [ref=f16e346]
+                - cell "Rohan Patel" [ref=f16e347]
+                - cell "₹421,800" [ref=f16e348]
+                - cell "2026-12-13T16:18:00.000Z" [ref=f16e349]
+                - cell "- ₹0" [ref=f16e350]
+                - cell "10%" [ref=f16e351]
+                - cell "₹42180" [ref=f16e352]
+        - generic [ref=f16e364]:
+          - generic [ref=f16e365]:
+            - heading "New commission override" [level=3] [ref=f16e366]
+            - button [ref=f16e371] [cursor=pointer]
+          - generic [ref=f16e375]:
+            - text: Campaign label
+            - textbox "Campaign label" [ref=f16e376]:
+              - /placeholder: Diwali Festive Boost
+          - generic [ref=f16e377]:
+            - generic [ref=f16e378]:
+              - text: Applies to
+              - combobox "Applies to" [ref=f16e379]:
+                - option "All ambassadors" [selected]
+                - option "Gold + Platinum tiers"
+                - option "Silver tier"
+                - option "Specific city/state"
+            - generic [ref=f16e380]:
+              - text: Override % (boost)
+              - spinbutton "Override % (boost)" [ref=f16e381]
+            - generic [ref=f16e382]:
+              - text: Start date
+              - generic [ref=f16e384]:
+                - textbox "Start date" [ref=f16e385] [cursor=pointer]:
+                  - /placeholder: dd/mm/yyyy
+                - textbox
+            - generic [ref=f16e388]:
+              - text: End date
+              - generic [ref=f16e390]:
+                - textbox "End date" [ref=f16e391] [cursor=pointer]:
+                  - /placeholder: dd/mm/yyyy
+                - textbox
+          - paragraph [ref=f16e394]: Override % replaces the ambassador's base commission for qualifying orders during this period.
+          - button "Create Override" [ref=f16e397] [cursor=pointer]
+  - status [ref=f16e353]:
+    - generic [ref=f16e358]:
+      - text: Static route
+      - button "Hide static indicator" [ref=f16e359] [cursor=pointer]
+  - alert [ref=f16e119]

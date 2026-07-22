@@ -1,0 +1,158 @@
+- generic [ref=f1e1]:
+  - region "Notifications alt+T"
+  - generic [ref=f1e2]:
+    - complementary [ref=f1e3]:
+      - generic [ref=f1e4]:
+        - img "Gajab Ambassadors" [ref=f1e5]
+        - generic [ref=f1e6]: Gajab.
+      - generic [ref=f1e8]:
+        - generic [ref=f1e9]: ADMIN CONSOLE
+        - button "V1 V2" [ref=f1e10] [cursor=pointer]:
+          - generic [ref=f1e11]: V1
+          - generic [ref=f1e12]: V2
+      - navigation [ref=f1e13]:
+        - link "Applicants" [ref=f1e14] [cursor=pointer]:
+          - /url: /admin/applicants
+        - link "Directory" [ref=f1e19] [cursor=pointer]:
+          - /url: /admin/directory
+        - link "Affiliate URLs" [ref=f1e25] [cursor=pointer]:
+          - /url: /admin/affiliate-urls
+        - link "Tasks" [ref=f1e29] [cursor=pointer]:
+          - /url: /admin/tasks
+        - link "Leaderboard" [ref=f1e33] [cursor=pointer]:
+          - /url: /admin/leaderboard
+        - link "Commissions" [ref=f1e40] [cursor=pointer]:
+          - /url: /admin/utilization
+        - link "Announcements" [ref=f1e43] [cursor=pointer]:
+          - /url: /admin/announcements
+        - link "Support" [ref=f1e47] [cursor=pointer]:
+          - /url: /admin/support
+        - link "Analytics" [ref=f1e50] [cursor=pointer]:
+          - /url: /admin/analytics
+      - button "Exit Admin" [ref=f1e53] [cursor=pointer]
+    - main [ref=f1e57]:
+      - generic [ref=f1e59]:
+        - generic [ref=f1e60]:
+          - generic [ref=f1e61]:
+            - generic [ref=f1e62]: Commission Overrides
+            - heading "Temporary commission campaigns" [level=1] [ref=f1e63]
+            - paragraph [ref=f1e64]: Boost commission % for a period. Auto-reverts when the window ends.
+          - button "New Override" [active] [ref=f1e65] [cursor=pointer]
+        - generic [ref=f1e67]:
+          - generic [ref=f1e69]:
+            - generic [ref=f1e70]:
+              - generic [ref=f1e71]:
+                - generic [ref=f1e72]: CO-003
+                - generic [ref=f1e73]: Scheduled
+              - heading "Republic Day Campaign" [level=3] [ref=f1e74]
+              - paragraph [ref=f1e75]: "Applies to: All ambassadors"
+              - generic [ref=f1e76]:
+                - generic [ref=f1e77]:
+                  - text: "Override:"
+                  - generic [ref=f1e78]: 14.00%
+                - generic [ref=f1e79]:
+                  - text: "Original:"
+                  - generic [ref=f1e80]: 10.00%
+                - generic [ref=f1e81]: "Start: 2027-01-22"
+                - generic [ref=f1e82]: "End: 2027-01-31"
+            - generic [ref=f1e83]:
+              - button [ref=f1e84] [cursor=pointer]
+              - button [ref=f1e88] [cursor=pointer]
+          - generic [ref=f1e93]:
+            - generic [ref=f1e94]:
+              - generic [ref=f1e95]:
+                - generic [ref=f1e96]: CO-002
+                - generic [ref=f1e97]: Active
+              - heading "Year-End Mega Sale" [level=3] [ref=f1e98]
+              - paragraph [ref=f1e99]: "Applies to: Gold + Platinum tiers"
+              - generic [ref=f1e100]:
+                - generic [ref=f1e101]:
+                  - text: "Override:"
+                  - generic [ref=f1e102]: 18.00%
+                - generic [ref=f1e103]:
+                  - text: "Original:"
+                  - generic [ref=f1e104]: 12.00%
+                - generic [ref=f1e105]: "Start: 2026-12-20"
+                - generic [ref=f1e106]: "End: 2027-01-05"
+            - generic [ref=f1e107]:
+              - button [ref=f1e108] [cursor=pointer]
+              - button [ref=f1e112] [cursor=pointer]
+          - generic [ref=f1e117]:
+            - generic [ref=f1e118]:
+              - generic [ref=f1e119]:
+                - generic [ref=f1e120]: CO-001
+                - generic [ref=f1e121]: Expired
+              - heading "Diwali Festive Boost" [level=3] [ref=f1e122]
+              - paragraph [ref=f1e123]: "Applies to: All ambassadors"
+              - generic [ref=f1e124]:
+                - generic [ref=f1e125]:
+                  - text: "Override:"
+                  - generic [ref=f1e126]: 15.00%
+                - generic [ref=f1e127]:
+                  - text: "Original:"
+                  - generic [ref=f1e128]: 10.00%
+                - generic [ref=f1e129]: "Start: 2026-10-15"
+                - generic [ref=f1e130]: "End: 2026-11-10"
+            - generic [ref=f1e131]:
+              - button [ref=f1e132] [cursor=pointer]
+              - button [ref=f1e136] [cursor=pointer]
+          - generic [ref=f1e141]:
+            - generic [ref=f1e142]:
+              - generic [ref=f1e143]:
+                - generic [ref=f1e144]: CO4-004
+                - generic [ref=f1e145]: Scheduled
+              - heading "AADI" [level=3] [ref=f1e146]
+              - paragraph [ref=f1e147]: "Applies to: All ambassadors"
+              - generic [ref=f1e148]:
+                - generic [ref=f1e149]:
+                  - text: "Override:"
+                  - generic [ref=f1e150]: 0.00%
+                - generic [ref=f1e151]:
+                  - text: "Original:"
+                  - generic [ref=f1e152]: 0.00%
+                - generic [ref=f1e153]: "Start: 2026-07-21"
+                - generic [ref=f1e154]: "End: 2026-07-22"
+            - generic [ref=f1e155]:
+              - button [ref=f1e156] [cursor=pointer]
+              - button [ref=f1e160] [cursor=pointer]
+        - generic [ref=f1e176]:
+          - generic [ref=f1e177]:
+            - heading "New commission override" [level=3] [ref=f1e178]
+            - button [ref=f1e179] [cursor=pointer]
+          - generic [ref=f1e183]:
+            - text: Label
+            - textbox "Label" [ref=f1e184]:
+              - /placeholder: Year-end bonus...
+          - generic [ref=f1e185]:
+            - text: Applies to
+            - combobox "Applies to" [ref=f1e186]:
+              - option "All ambassadors" [selected]
+              - option "Gold + Platinum tiers"
+              - option "Silver tier"
+              - option "Bronze tier"
+          - generic [ref=f1e187]:
+            - generic [ref=f1e188]:
+              - text: Override %
+              - spinbutton "Override %" [ref=f1e189]: "12"
+            - generic [ref=f1e190]:
+              - text: Original %
+              - spinbutton "Original %" [ref=f1e191]: "8"
+          - generic [ref=f1e192]:
+            - generic [ref=f1e193]:
+              - text: Start date
+              - textbox "Start date" [ref=f1e194]
+            - generic [ref=f1e195]:
+              - text: End date
+              - textbox "End date" [ref=f1e196]
+          - generic [ref=f1e197]:
+            - text: Status
+            - combobox "Status" [ref=f1e198]:
+              - option "Scheduled" [selected]
+              - option "Active"
+              - option "Expired"
+          - button "Create override" [ref=f1e199] [cursor=pointer]
+  - status [ref=f1e164]:
+    - generic [ref=f1e169]:
+      - text: Static route
+      - button "Hide static indicator" [ref=f1e170] [cursor=pointer]
+  - alert [ref=f1e174]

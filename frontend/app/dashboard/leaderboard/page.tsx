@@ -1,21 +1,20 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { Crown, Trophy, Medal, MapPin, Globe, Sparkles, X } from "lucide-react";
-import confetti from "canvas-confetti";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
 import { useAuth } from "@/lib/auth";
 
 const DEMO_AMB_ID = "amb_005";
 
-const PodiumCard = ({ rank, name, college, revenue, avatar, color, height, icon: Icon }) => (
-  <div className={`gajab-card p-4 text-center ${color} flex flex-col justify-end`} style={{ minHeight: height }}>
-    <Icon className="w-8 h-8 mx-auto mb-2" strokeWidth={2.5} />
-    <img src={avatar} alt="" className="w-16 h-16 mx-auto rounded-full object-cover" />
-    <p className="font-display text-3xl mt-2">#{rank}</p>
+const PodiumCard = ({ rank, name, college, revenue, avatar, color, icon: Icon }) => (
+  <div className={`gajab-card p-3 sm:p-4 text-center ${color} flex flex-col justify-end`}>
+    <Icon className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2" strokeWidth={2.5} />
+    <img src={avatar} alt="" className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full object-cover" />
+    <p className="font-display text-2xl sm:text-3xl mt-1 sm:mt-2">#{rank}</p>
     <p className="font-display font-extrabold mt-1 truncate">{name}</p>
-    <p className="text-xs text-[#5A6378] truncate">{college}</p>
-    <p className="font-display text-xl mt-2">₹{(revenue/1000).toFixed(0)}K</p>
+    <p className="text-[10px] sm:text-xs text-[#5A6378] truncate">{college}</p>
+    <p className="font-display text-lg sm:text-xl mt-1 sm:mt-2">₹{(revenue/1000).toFixed(0)}K</p>
   </div>
 );
 
@@ -47,18 +46,20 @@ export default function Leaderboard() {
     if (yourEntry && yourEntry.displayRank <= 10 && !firedRef.current) {
       firedRef.current = true;
       setShowTop10Popup(true);
-      // Confetti burst — brand colors
       const brand = ["#F26B1F", "#FFC93C", "#1B2D54", "#10B981", "#EF4444"];
-      const shoot = (originX) => confetti({
-        particleCount: 80,
-        spread: 70,
-        startVelocity: 45,
-        origin: { x: originX, y: 0.6 },
-        colors: brand,
+      import("canvas-confetti").then((mod) => {
+        const confetti = mod.default;
+        const shoot = (originX) => confetti({
+          particleCount: 80,
+          spread: 70,
+          startVelocity: 45,
+          origin: { x: originX, y: 0.6 },
+          colors: brand,
+        });
+        shoot(0.25);
+        setTimeout(() => shoot(0.75), 200);
+        setTimeout(() => confetti({ particleCount: 120, spread: 100, origin: { y: 0.5 }, colors: brand }), 400);
       });
-      shoot(0.25);
-      setTimeout(() => shoot(0.75), 200);
-      setTimeout(() => confetti({ particleCount: 120, spread: 100, origin: { y: 0.5 }, colors: brand }), 400);
     }
   }, [ranked]);
 
@@ -101,10 +102,10 @@ export default function Leaderboard() {
       </div>
 
       {first && second && third && (
-        <div className="grid grid-cols-3 gap-3 items-end">
-          <PodiumCard rank={second.displayRank} name={second.name} college={second.college} revenue={second.revenue} avatar={second.avatar} icon={Trophy} color="bg-[#F3EFE9]" height="260px" />
-          <PodiumCard rank={first.displayRank} name={first.name} college={first.college} revenue={first.revenue} avatar={first.avatar} icon={Crown} color="bg-gradient-to-br from-[#FFC93C] to-[#FFB81C]" height="300px" />
-          <PodiumCard rank={third.displayRank} name={third.name} college={third.college} revenue={third.revenue} avatar={third.avatar} icon={Medal} color="bg-[#FFE3E5]" height="240px" />
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <PodiumCard rank={second.displayRank} name={second.name} college={second.college} revenue={second.revenue} avatar={second.avatar} icon={Trophy} color="bg-[#F3EFE9]" />
+          <PodiumCard rank={first.displayRank} name={first.name} college={first.college} revenue={first.revenue} avatar={first.avatar} icon={Crown} color="bg-gradient-to-br from-[#FFC93C] to-[#FFB81C]" />
+          <PodiumCard rank={third.displayRank} name={third.name} college={third.college} revenue={third.revenue} avatar={third.avatar} icon={Medal} color="bg-[#FFE3E5]" />
         </div>
       )}
 

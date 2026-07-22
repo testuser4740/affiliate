@@ -7,6 +7,7 @@ import { AmbassadorRepository } from "../repositories/AmbassadorRepository";
 import { TierRepository } from "../repositories/TierRepository";
 import { CommissionHistoryRepository } from "../repositories/CommissionHistoryRepository";
 import { CommissionOverrideRepository } from "../repositories/CommissionOverrideRepository";
+import { CommissionOverride } from "../models/commission-overrides";
 import { liveBus } from "../lib/eventBus";
 
 export interface CommissionInput {
@@ -93,37 +94,41 @@ export class CommissionService {
     return resolveTier(Number(ambassador.revenue ?? 0)).commission;
   }
 
-  /** Finds a currently-valid override for a tier based on date window. */
-  private async activeOverrideFor(tierName: string) {
+  /** Finds a currently-valid override for a tier based on date window and appliesTo match. */
+  private async activeOverrideFor(tierName: string): Promise<CommissionOverride | null> {
     const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
     const overrides = await this.commissionOverrideRepository.repository.find({
-      where: { appliesTo: tierName },
       order: { startDate: "DESC" },
     });
 
-    let activeOverride = null;
+    const tier = tierName.toLowerCase();
+    let activeOverride: CommissionOverride | null = null;
+
     for (const override of overrides) {
+      const appliesTo = (override.appliesTo || "").toLowerCase();
+      if (appliesTo !== "all ambassadors" && !appliesTo.includes(tier)) continue;
+
       const start = new Date(override.startDate);
       const end = new Date(override.endDate);
-      if (now < start) {
-        if (override.status !== "Scheduled") {
-          override.status = "Scheduled";
-          await this.commissionOverrideRepository.repository.save(override);
-        }
-        activeOverride = override;
-        break;
-      } else if (now >= start && now <= end) {
-        if (override.status !== "Active") {
-          override.status = "Active";
-          await this.commissionOverrideRepository.repository.save(override);
-        }
-        activeOverride = override;
-        break;
+      const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate(), 23, 59, 59, 999);
+
+      let newStatus: string;
+      if (todayStart > endDay) {
+        newStatus = "Expired";
+      } else if (todayStart >= startDay && todayStart <= endDay) {
+        newStatus = "Active";
+        if (!activeOverride) activeOverride = override;
       } else {
-        if (override.status !== "Expired") {
-          override.status = "Expired";
-          await this.commissionOverrideRepository.repository.save(override);
-        }
+        newStatus = "Scheduled";
+      }
+
+      if (override.status !== newStatus) {
+        override.status = newStatus;
+        await this.commissionOverrideRepository.repository.save(override);
       }
     }
 
@@ -167,6 +172,37 @@ export class CommissionService {
         await this.ambassadorRepository.repository.save(a);
       }
       rank += 1;
+    }
+  }
+
+  async syncOverrideStatuses(): Promise<void> {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    const overrides = await this.commissionOverrideRepository.repository.find({
+      order: { startDate: "DESC" },
+    });
+
+    for (const override of overrides) {
+      const start = new Date(override.startDate);
+      const end = new Date(override.endDate);
+      const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate(), 23, 59, 59, 999);
+
+      let newStatus: string;
+      if (todayStart > endDay) {
+        newStatus = "Expired";
+      } else if (todayStart >= startDay && todayStart <= endDay) {
+        newStatus = "Active";
+      } else {
+        newStatus = "Scheduled";
+      }
+
+      if (override.status !== newStatus) {
+        override.status = newStatus;
+        await this.commissionOverrideRepository.repository.save(override);
+      }
     }
   }
 }

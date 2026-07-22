@@ -8,6 +8,25 @@ import {
   UpdateCommissionOverrideInput,
 } from "../../dto/commission-override.dto";
 import { liveBus } from "../lib/eventBus";
+import { Like } from "typeorm";
+
+const toDateOnly = (d?: Date | string): Date | undefined => {
+  if (!d) return undefined;
+  const date = d instanceof Date ? d : new Date(d);
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
+const computeStatus = (startDate?: Date, endDate?: Date): string => {
+  const today = new Date();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const start = toDateOnly(startDate);
+  const end = toDateOnly(endDate);
+
+  if (end && end < todayStart) return "Expired";
+  if (start && start.getTime() === todayStart.getTime()) return "Active";
+  if (start && start > todayStart) return "Scheduled";
+  return "Active";
+};
 
 export interface CommissionOverrideFilter {
   status?: string;
@@ -40,16 +59,24 @@ export class CommissionOverrideService {
 
   async create(input: CreateCommissionOverrideInput): Promise<CommissionOverride> {
     if (!input.label?.trim()) throw new NotFoundError("Campaign label is required");
-    const override = this.repository.repository.create({
+    const repo = this.repository.repository;
+    const count = await repo.count({ where: { id: Like("CO-%") } });
+    const sequence = String(count + 1).padStart(3, "0");
+    const today = new Date();
+    const override = repo.create({
+      id: `CO-${sequence}`,
       label: input.label,
       appliesTo: input.appliesTo,
       overridePct: input.overridePct ?? 0,
       originalPct: input.originalPct ?? 0,
-      startDate: input.startDate ? new Date(input.startDate) : undefined,
-      endDate: input.endDate ? new Date(input.endDate) : undefined,
-      status: input.status ?? "Scheduled",
+      startDate: input.startDate ? new Date(input.startDate) : new Date(today.getFullYear(), today.getMonth(), today.getDate()),
+      endDate: input.endDate ? new Date(input.endDate) : new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7),
+      status: computeStatus(
+        input.startDate ? new Date(input.startDate) : undefined,
+        input.endDate ? new Date(input.endDate) : undefined,
+      ),
     } as Partial<CommissionOverride>);
-    const saved = await this.repository.repository.save(override);
+    const saved = await repo.save(override);
     liveBus.broadcast({ type: "commission_overrides" });
     return saved;
   }
@@ -58,6 +85,7 @@ export class CommissionOverrideService {
     const repo = this.repository.repository;
     const override = await this.getById(id);
     repo.merge(override, input);
+    override.status = computeStatus(override.startDate, override.endDate);
     const saved = await repo.save(override);
     liveBus.broadcast({ type: "commission_overrides" });
     return saved;

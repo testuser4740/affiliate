@@ -90,9 +90,9 @@ export default function Performance() {
         <button onClick={()=>toast.success("CSV export coming soon")} className="btn-ghost" data-testid="perf-export"><Download className="w-4 h-4" /> Export</button>
       </div>
 
-      {/* Table */}
+      {/* Table - card layout on mobile, table on larger screens */}
       <div className="gajab-card p-0 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="hidden sm:overflow-x-auto sm:block">
           <table className="w-full text-sm">
             <thead className="bg-[#FFF7EE] border-b border-[#EFEAE0]">
               <tr className="text-left text-[10px] font-bold uppercase tracking-wider text-[#5A6378]">
@@ -117,6 +117,39 @@ export default function Performance() {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="sm:hidden space-y-2 p-3">
+          {filtered.map((o, idx) => (
+            <div key={o.id} className="p-3 rounded-xl border border-[#EFEAE0] bg-white space-y-2" data-testid={`perf-row-mobile-${o.id}`}>
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs text-[#5A6378]">{o.id}</span>
+                <span className="text-xs text-[#5A6378]">{o.date}</span>
+              </div>
+              <p className="font-bold text-sm">{o.product}</p>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-[#5A6378]">{o.category}</span>
+                {isV2 && <span className="text-xs text-[#5A6378]">Qty: {(idx % 3) + 1}</span>}
+              </div>
+              {isV2 ? (
+                <div className="text-xs">
+                  <span className="font-bold text-[#1B2D54]">{buyerNames[idx % buyerNames.length]}</span>
+                  <span className="text-[#5A6378] font-mono ml-1">{maskPhone("+91 98765 43210")}</span>
+                </div>
+              ) : (
+                <p className="text-xs text-[#5A6378]">{o.urlLabel}</p>
+              )}
+              <div className="flex items-center justify-between pt-1 border-t border-dashed border-[#EFEAE0]">
+                <div>
+                  <p className="text-xs text-[#5A6378]">Order <span className="font-bold text-[#1B2D54]">₹{o.orderValue.toLocaleString()}</span></p>
+                  <p className="text-xs text-[#5A6378]">Comm <span className="font-bold text-[#F26B1F]">₹{o.commission}</span> ({o.commissionPct}%)</p>
+                </div>
+                <div className="text-right space-y-1">
+                  <div><span className={`gajab-sticker border text-[9px] px-2 ${statusBadge(o.status)}`}>{o.status}</span></div>
+                  <div><span className={`gajab-sticker border text-[9px] px-2 ${payoutBadge(o.payoutStatus)}`}>{o.payoutStatus}</span></div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

@@ -4,6 +4,20 @@ import { api, get, post, put, del, ApiList } from "./api";
 import { CreateCommissionOverrideInput, UpdateCommissionOverrideInput } from "./dto/commission-override.dto";
 import { CreateAnnouncementInput, UpdateAnnouncementInput } from "./dto/announcement.dto";
 
+export interface Poc {
+  id: string;
+  name: string;
+  role: string;
+  region: string;
+  email?: string;
+  phone?: string;
+  whatsapp?: string;
+  avatar?: string;
+  linkedAffiliates?: string[];
+  workingHours?: string;
+  createdAt?: string;
+}
+
 export interface Applicant {
   id: string;
   name: string;
@@ -162,6 +176,8 @@ export const backend = {
     del<void>(`/admin/commission-overrides/${id}`),
   listAffiliateUrls: (ambassadorId?: string, channel?: string, q?: string) =>
     get<ApiList<AffiliateUrl>>("/admin/affiliate-urls", { ambassadorId, channel, q }),
+  updatePocAmbassadors: (pocId: string, linkedAffiliates: string[]) =>
+    post<Poc>(`/admin/pocs/${pocId}/ambassadors`, { linkedAffiliates }),
 
   // Ambassador
   ambassadorHome: (id: string) => get<{ ambassador: Ambassador; stats: any; urls: any[]; recentOrders: any[] }>(`/ambassador/${id}/home`),
@@ -178,6 +194,8 @@ export const backend = {
     get<Ambassador[]>("/ambassador/leaderboard", { state }),
   listTasks: (ambassadorId: string) =>
     get<Task[]>(`/ambassador/${ambassadorId}/tasks`),
+  submitTask: (ambassadorId: string, taskId: string, body: { proof?: string; college?: string }) =>
+    post<any>(`/ambassador/${ambassadorId}/tasks/${taskId}/submit`, body),
   sendMessage: (ambassadorId: string, body: { from: string; subject: string; body: string }) =>
     post<InboxMessage>(`/admin/ambassadors/${ambassadorId}/inbox`, body),
 };

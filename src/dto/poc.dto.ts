@@ -21,3 +21,7 @@ export class UpdatePocInput {
   @IsOptional() @IsString() avatar?: string;
   @IsOptional() @IsString() workingHours?: string;
 }
+
+export class UpdatePocAmbassadorsInput {
+  linkedAffiliates!: string[];
+}

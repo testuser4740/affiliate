@@ -4,6 +4,7 @@ import { Ambassador, resolveTier } from "../models/ambassadors";
 import { Tier } from "../models/tiers";
 import { AmbassadorRepository } from "../repositories/AmbassadorRepository";
 import { TierRepository } from "../repositories/TierRepository";
+import { CommissionService } from "./commission.service";
 import { NotFoundError } from "../errors";
 import { UpdateAmbassadorInput } from "../../dto/ambassador.dto";
 import { liveBus } from "../lib/eventBus";
@@ -20,6 +21,7 @@ export class AmbassadorService {
   constructor(
     private repository: AmbassadorRepository,
     private tierRepository: TierRepository,
+    private commissionService: CommissionService,
     @Logger(__filename) private log: LoggerInterface,
   ) {}
 
@@ -69,7 +71,7 @@ export class AmbassadorService {
     const tierInfo = resolveTier(Number(ambassador.revenue ?? 0));
     const tierRecord = await this.tierRepository.repository.findOne({ where: { name: tierInfo.level } });
     ambassador.tier = tierRecord ?? null;
-    ambassador.commissionPct = tierInfo.commission;
+    ambassador.commissionPct = await this.commissionService.effectiveRate(ambassador);
     return this.repository.repository.save(ambassador);
   }
 

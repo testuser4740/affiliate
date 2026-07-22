@@ -1,4 +1,5 @@
 import { Service } from "typedi";
+import { Like } from "typeorm";
 import { Logger, LoggerInterface } from "../../decorators/Logger";
 import { Task } from "../models/tasks";
 import { TaskSubmission } from "../models/task-submissions";
@@ -52,14 +53,18 @@ export class TaskService {
 
   async create(input: CreateTaskInput): Promise<Task> {
     if (!input.title?.trim()) throw new NotFoundError("Title is required");
-    const task = this.repo().create({
+    const repo = this.repo();
+    const count = await repo.count({ where: { id: Like(`T-%`) } });
+    const sequence = (count + 1).toString().padStart(3, "0");
+    const task = repo.create({
+      id: `T-${sequence}`,
       title: input.title,
       description: input.description,
       deadline: input.deadline ? new Date(input.deadline) : undefined,
       reward: input.reward ?? 0,
       status: input.status ?? "Active",
     } as Partial<Task>);
-    const saved = await this.repo().save(task);
+    const saved = await repo.save(task);
     liveBus.broadcast({ type: "tasks" });
     return saved;
   }
@@ -117,6 +122,30 @@ export class TaskService {
     return saved;
   }
 
+  async assignedTasks(ambassadorId: string): Promise<any[]> {
+    const subs = await this.subRepo().find({
+      where: { ambassadorId },
+      order: { createdAt: "DESC" },
+    });
+    const result: any[] = [];
+    for (const sub of subs) {
+      const task = sub.taskId ? await this.repo().findOne({ where: { id: sub.taskId } }) : null;
+      result.push({
+        id: sub.taskId ?? sub.submissionId,
+        submissionId: sub.submissionId,
+        title: task?.title ?? sub.task,
+        description: task?.description ?? "",
+        deadline: task?.deadline ?? null,
+        reward: task?.reward ?? 0,
+        status: sub.status,
+        rejectReason: sub.rejectReason,
+        submission: sub.proof,
+        submittedOn: sub.submittedOn,
+      });
+    }
+    return result;
+  }
+
   async submissions(status?: string): Promise<{ data: TaskSubmission[]; total: number }> {
     const where: Record<string, unknown> = {};
     if (status) where.status = status;
@@ -125,6 +154,9 @@ export class TaskService {
   }
 
   async updateSubmission(submission: TaskSubmission): Promise<TaskSubmission> {
-    return this.subRepo().save(submission);
+    submission.submittedOn = new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+    const saved = await this.subRepo().save(submission);
+    liveBus.broadcast({ type: "tasks" });
+    return saved;
   }
 }

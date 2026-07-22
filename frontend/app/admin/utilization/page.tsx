@@ -6,7 +6,6 @@ import DateInputDDMMYYYY from "@/components/DateInputDDMMYYYY";
 import { useVersion } from "@/hooks/useVersion";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
-import { get } from "@/lib/api";
 
 interface UtilRow {
   code: string;
@@ -43,9 +42,9 @@ export default function Utilization() {
   const [ufilter, setUfilter] = useState("All codes");
   const [oq, setOq] = useState("");
   const [ostatus, setOstatus] = useState("All statuses");
-  const [editing, setEditing] = useState(null); // override being edited inline
+  const [editing, setEditing] = useState(null);
   const [editPct, setEditPct] = useState("");
-  const [form, setForm] = useState({ label: "", appliesTo: "All ambassadors", overridePct: "", startDate: "", endDate: "" });
+  const [form, setForm] = useState({ label: "", appliesTo: "All ambassadors", overridePct: "", startDate: "", endDate: "", status: "Scheduled" });
 
   const rawUtil = useBackend(() => backend.listAffiliateUrls().then(r => r.data), [], [], ["affiliate_urls", "leaderboard", "orders"]);
   const referralUtilization: UtilRow[] = rawUtil.map(u => ({
@@ -58,26 +57,54 @@ export default function Utilization() {
     commissionPct: u.commission ? `${Math.round(Number(u.commission) / (Number(u.revenue) || 1) * 100)}%` : "0%",
     commissionValue: Number(u.commission ?? 0),
   }));
-  const commissionOverrides = useBackend<Override[]>(() => get("/admin/commission-overrides").then(r => (r as any).data), [], [], ["commission_overrides"]);
+  const commissionOverrides = useBackend<Override[]>(() => backend.listCommissionOverrides().then(r => r.data), [], [], ["commission_overrides"]);
 
   const filteredUtil = referralUtilization.filter(u => !isV2 || (u.code + u.orderId + u.customerId).toLowerCase().includes(uq.toLowerCase())).filter(u => !isV2 || ufilter === "All codes" || u.code === ufilter);
   const filteredOverrides = commissionOverrides.filter(o => !isV2 || (o.id + o.label + o.appliesTo).toLowerCase().includes(oq.toLowerCase())).filter(o => !isV2 || ostatus === "All statuses" || o.status === ostatus);
   const codeOptions = ["All codes", ...new Set(referralUtilization.map(u=>u.code))];
+  const codeOptionEls = codeOptions.map((c: string) => <option key={c}>{c}</option>);
 
   const beginEdit = (o) => { setEditing(o.id); setEditPct(String(o.overridePct)); };
-  const saveEdit = (o) => {
+  const saveEdit = async (o) => {
     const n = parseFloat(editPct);
     if (!isFinite(n) || n <= 0 || n > 50) { toast.error("Enter a % between 0 and 50"); return; }
-    toast.success(`${o.label}: commission override updated to ${n}%`);
-    setEditing(null);
+    try {
+      await backend.updateCommissionOverride(o.id, { overridePct: n } as any);
+      toast.success(`${o.label}: commission override updated to ${n}%`);
+      setEditing(null);
+    } catch {
+      toast.error("Failed to update override");
+    }
   };
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     if (!form.label || !form.overridePct) { toast.error("Label & override % required"); return; }
-    toast.success(`Commission override "${form.label}" created`);
-    setOpen(false);
-    setForm({ label: "", appliesTo: "All ambassadors", overridePct: "", startDate: "", endDate: "" });
+    try {
+      await backend.createCommissionOverride({
+        label: form.label,
+        appliesTo: form.appliesTo,
+        overridePct: parseFloat(form.overridePct),
+        originalPct: 0,
+        startDate: form.startDate || undefined,
+        endDate: form.endDate || undefined,
+        status: form.status,
+      } as any);
+      toast.success(`Commission override "${form.label}" created`);
+      setOpen(false);
+      setForm({ label: "", appliesTo: "All ambassadors", overridePct: "", startDate: "", endDate: "", status: "Scheduled" });
+    } catch {
+      toast.error("Failed to create override");
+    }
+  };
+
+  const del = async (o) => {
+    try {
+      await backend.deleteCommissionOverride(o.id);
+      toast.success(`Deleted ${o.label}`);
+    } catch {
+      toast.error("Failed to delete override");
+    }
   };
 
   return (
@@ -123,7 +150,7 @@ export default function Utilization() {
                   <td className="p-3 text-xs">{o.startDate}</td>
                   <td className="p-3 text-xs">{o.endDate}</td>
                   <td className="p-3"><span className={`gajab-sticker border ${overrideStatusClr[o.status]}`}>{o.status}</span></td>
-                  <td className="p-3"><div className="flex gap-1"><button onClick={()=>beginEdit(o)} className="p-1.5 hover:bg-[#FFF7EE] rounded-lg" data-testid={`override-edit-${o.id}`}><Edit className="w-3.5 h-3.5 text-[#5A6378]" /></button><button onClick={()=>toast.success(`Deleted ${o.label}`)} className="p-1.5 hover:bg-[#FEE2E2] rounded-lg"><Trash2 className="w-3.5 h-3.5 text-[#991B1B]" /></button></div></td>
+                   <td className="p-3"><div className="flex gap-1"><button onClick={()=>beginEdit(o)} className="p-1.5 hover:bg-[#FFF7EE] rounded-lg" data-testid={`override-edit-${o.id}`}><Edit className="w-3.5 h-3.5 text-[#5A6378]" /></button><button onClick={()=>del(o)} className="p-1.5 hover:bg-[#FEE2E2] rounded-lg"><Trash2 className="w-3.5 h-3.5 text-[#991B1B]" /></button></div></td>
                 </tr>
               ))}
             </tbody>
@@ -134,7 +161,7 @@ export default function Utilization() {
       {/* ORDER UTILIZATION */}
       <div className="gajab-card p-0 overflow-hidden">
         <div className="p-5 pb-3 flex flex-wrap justify-between items-center gap-3"><div><h3 className="font-display text-xl">Order utilization log</h3><p className="text-xs text-[#5A6378]">Every order placed via a referral URL.</p></div>
-          {isV2 && (<div className="flex gap-2 flex-wrap"><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A6378]" /><input value={uq} onChange={e=>setUq(e.target.value)} placeholder="Search code, order, customer..." className="input-gajab pl-10 h-10 w-64" data-testid="util-search" /></div><select value={ufilter} onChange={e=>setUfilter(e.target.value)} className="input-gajab h-10 w-40" data-testid="util-filter">{codeOptions.map(c=><option key={c}>{c}</option>)}</select></div>)}
+           {isV2 && (<div className="flex gap-2 flex-wrap"><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A6378]" /><input value={uq} onChange={e=>setUq(e.target.value)} placeholder="Search code, order, customer..." className="input-gajab pl-10 h-10 w-64" data-testid="util-search" /></div><select value={ufilter} onChange={e=>setUfilter(e.target.value)} className="input-gajab h-10 w-40" data-testid="util-filter">{codeOptionEls}</select></div>)}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

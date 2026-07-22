@@ -5,7 +5,8 @@ import {
   Param,
   QueryParam,
   Body,
-  Authorized
+  Authorized,
+  BadRequestError,
 } from "routing-controllers";
 import { Service } from "typedi";
 import { ResponseSchema } from "routing-controllers-openapi";
@@ -34,11 +35,12 @@ export class AmbassadorTaskController {
   @Get("/:ambassadorId/tasks")
   @ResponseSchema(Task, { isArray: true })
   async tasks(
-    @Param("ambassadorId") _ambassadorId: string,
+    @Param("ambassadorId") ambassadorId: string,
     @QueryParam("status") status?: string,
-  ): Promise<Task[]> {
-    const { data } = await this.taskService.list({ status });
-    return data;
+  ): Promise<any[]> {
+    const all = await this.taskService.assignedTasks(ambassadorId);
+    if (status) return all.filter((t) => t.status === status);
+    return all;
   }
 
   /**
@@ -79,22 +81,42 @@ export class AmbassadorTaskController {
     @Param("taskId") taskId: string,
     @Body() body: { proof?: string; college?: string },
   ): Promise<TaskSubmission> {
-    await this.ambassadorService.getById(ambassadorId);
-    const task = await this.taskService.getById(taskId);
+    console.log(`[submitTask] ambassadorId=${ambassadorId} taskId=${taskId} proof=${body?.proof?.slice(0,50)}`);
+    try {
+      await this.ambassadorService.getById(ambassadorId);
+      const task = await this.taskService.getById(taskId);
+      console.log(`[submitTask] task found: title="${task.title}"`);
 
-    const { data: allSubs } = await this.taskService.submissions();
-    const existing = allSubs.find(
-      (s) => s.ambassadorId === ambassadorId && s.task === task.title && s.status === "Pending Review",
-    );
+      const { data: allSubs } = await this.taskService.submissions();
+      const existing = allSubs.find(
+        (s) => s.ambassadorId === ambassadorId && s.task === task.title,
+      );
 
-    if (existing) {
-      existing.proof = body.proof ?? existing.proof;
-      return this.taskService.updateSubmission(existing);
+      if (existing) {
+        console.log(`[submitTask] found existing submission ${existing.submissionId}, status=${existing.status}`);
+
+        if (existing.status === "Under Review")
+          throw new BadRequestError("Submission already under review");
+        if (existing.status === "Approved")
+          throw new BadRequestError("Task already approved");
+        if (existing.status === "Resubmitted")
+          throw new BadRequestError("Resubmission already pending review");
+        if (existing.status !== "Rejected" && existing.status !== "Pending Review")
+          throw new BadRequestError("Cannot submit at this stage");
+
+        existing.proof = body.proof ?? existing.proof;
+        existing.status = existing.status === "Rejected" ? "Resubmitted" : "Under Review";
+        return this.taskService.updateSubmission(existing);
+      }
+
+      console.log(`[submitTask] no existing submission — creating new one via assign()`);
+      return this.taskService.assign(taskId, {
+        ambassador: ambassadorId,
+        college: body.college,
+      });
+    } catch (err: any) {
+      console.error(`[submitTask] ERROR:`, err?.message ?? err);
+      throw err;
     }
-
-    return this.taskService.assign(taskId, {
-      ambassador: ambassadorId,
-      college: body.college,
-    });
   }
 }

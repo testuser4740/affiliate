@@ -15,23 +15,16 @@ import { ResponseSchema } from "routing-controllers-openapi";
 import { Poc } from "../../models/pocs";
 import { PocService } from "../../services/poc.service";
 import { ApiList } from "../../types";
-import { CreatePocInput, UpdatePocInput } from "../../../dto/poc.dto";
+import { CreatePocInput, UpdatePocInput, UpdatePocAmbassadorsInput } from "../../../dto/poc.dto";
 
 @Service()
-@Authorized("admin")
 @JsonController("/admin/pocs")
 export class PocController {
   @Inject()
   private service!: PocService;
 
-  /**
-   * @openapi
-   * /admin/pocs:
-   *   get:
-   *     tags: [Admin / POCs]
-   *     summary: List POCs
-   */
   @Get("/")
+  @Authorized(["admin", "ambassador"])
   @ResponseSchema(Poc, { isArray: true })
   async list(
     @QueryParam("region") region?: string,
@@ -42,54 +35,37 @@ export class PocController {
   }
 
   @Get("/:id")
+  @Authorized(["admin", "ambassador"])
   @ResponseSchema(Poc)
   async get(@Param("id") id: string): Promise<Poc> {
     return this.service.getById(id);
   }
 
-  /**
-   * @openapi
-   * /admin/pocs:
-   *   post:
-   *     tags: [Admin / POCs]
-   *     summary: Create a POC
-   *     requestBody:
-   *       required: true
-   *       content: {
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/CreatePocInput'
-   *       }
-   */
   @Post("/")
+  @Authorized("admin")
   @ResponseSchema(Poc)
   async create(@Body() body: CreatePocInput): Promise<Poc> {
     return this.service.create(body);
   }
 
-  /**
-   * @openapi
-   * /admin/pocs/{id}:
-   *   put:
-   *     tags: [Admin / POCs]
-   *     summary: Update a POC
-   *     requestBody:
-   *       required: true
-   *       content: {
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/UpdatePocInput'
-   *       }
-   */
   @Put("/:id")
+  @Authorized("admin")
   @ResponseSchema(Poc)
   async update(@Param("id") id: string, @Body() body: UpdatePocInput): Promise<Poc> {
     return this.service.update(id, body);
   }
 
   @Delete("/:id")
+  @Authorized("admin")
   @OnUndefined(204)
   async remove(@Param("id") id: string): Promise<void> {
     return this.service.remove(id);
+  }
+
+  @Post("/:id/ambassadors")
+  @Authorized("admin")
+  @ResponseSchema(Poc)
+  async updateAmbassadors(@Param("id") id: string, @Body() body: UpdatePocAmbassadorsInput): Promise<Poc> {
+    return this.service.updateAmbassadors(id, body.linkedAffiliates);
   }
 }

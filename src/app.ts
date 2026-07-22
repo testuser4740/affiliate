@@ -5,6 +5,7 @@ import { winstonLoader } from './loaders/winstonLoader';
 import { iocLoader } from './loaders/iocLoader';
 import { typeormLoader } from './loaders/typeormLoader';
 import { expressLoader } from './loaders/expressLoader';
+import { commissionSyncLoader } from './loaders/commissionSyncLoader';
 import { homeLoader } from './loaders/homeLoader';
 import { publicLoader } from './loaders/publicLoader';
 
@@ -16,6 +17,7 @@ bootstrapMicroframework({
         iocLoader,
         typeormLoader,
         expressLoader,
+        commissionSyncLoader,
         homeLoader,
         publicLoader,
     ],

@@ -3,8 +3,6 @@ import {
   PrimaryColumn,
   Column,
   CreateDateColumn,
-  BeforeInsert,
-  Like,
 } from "typeorm";
 
 @Entity("commission_overrides")
@@ -35,17 +33,4 @@ export class CommissionOverride {
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
-
-  @BeforeInsert()
-  async generateId(): Promise<void> {
-    if (this.id) {
-      return;
-    }
-    const count = await (
-      (this as unknown as { constructor: { getRepository?: () => unknown } })
-        .constructor as { getRepository?: () => { count: (opts: unknown) => Promise<number> } }
-    ).getRepository?.()?.count({ where: { id: Like(`CO-%`) } }) ?? 0;
-    const sequence = ((count ?? 0) + 1).toString().padStart(3, "0");
-    this.id = `CO-${sequence}`;
-  }
 }

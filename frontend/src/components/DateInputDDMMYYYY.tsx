@@ -10,8 +10,16 @@ export default function DateInputDDMMYYYY({ value, onChange, placeholder = "dd/m
 
   const open = () => {
     if (!ref.current) return;
-    if (ref.current.showPicker) ref.current.showPicker();
-    else ref.current.click();
+    if (ref.current.showPicker) {
+      try {
+        ref.current.showPicker();
+        return;
+      } catch {
+        ref.current.click();
+      }
+    } else {
+      ref.current.click();
+    }
   };
 
   return (

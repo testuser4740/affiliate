@@ -23,12 +23,61 @@ export interface LiveEvent {
   ambassadorId?: string;
 }
 
-/**
- * Opens a single Server-Sent Events connection to the backend's live stream.
- * The connection stays open until the component unmounts (i.e. until logout /
- * navigation away) — no polling, no repeated fetching. Every DB change the
- * server broadcasts is delivered here in real time.
- */
+type Listener = (event: LiveEvent) => void;
+
+class SharedEventSource {
+  private connections = new Map<string, { es: EventSource; refCount: number; listeners: Set<Listener> }>();
+
+  subscribe(listener: Listener, ambassadorId?: string): () => void {
+    const key = ambassadorId ?? "__admin__";
+    let entry = this.connections.get(key);
+    if (!entry) {
+      const url = ambassadorId
+        ? `${API_BASE_URL}/stream?ambassadorId=${encodeURIComponent(ambassadorId)}`
+        : `${API_BASE_URL}/stream`;
+      const es = new EventSource(url);
+      entry = { es, refCount: 0, listeners: new Set() };
+      this.connections.set(key, entry);
+
+      es.onmessage = (msg) => {
+        if (msg.data) {
+          try {
+            const event: LiveEvent = { type: "ping", ...JSON.parse(msg.data) };
+            entry!.listeners.forEach(l => l(event));
+          } catch { /* ignore */ }
+        }
+      };
+
+      const handle = (e: MessageEvent) => {
+        let payload: Partial<LiveEvent> = {};
+        try { payload = e.data ? JSON.parse(e.data) : {}; } catch { /* ignore */ }
+        const event = { type: e.type as LiveEventType, ...payload } as LiveEvent;
+        entry!.listeners.forEach(l => l(event));
+      };
+
+      const eventTypes: LiveEventType[] = ["leaderboard", "orders", "commission", "ambassador_created", "inbox", "pocs", "announcements", "tasks", "affiliate_urls", "commission_overrides", "applicants", "analytics", "connected", "ping"];
+      eventTypes.forEach(type => es.addEventListener(type, handle as EventListener));
+      es.onerror = () => {};
+    }
+
+    entry.refCount++;
+    entry.listeners.add(listener);
+
+    return () => {
+      const e = this.connections.get(key);
+      if (!e) return;
+      e.listeners.delete(listener);
+      e.refCount--;
+      if (e.refCount <= 0) {
+        e.es.close();
+        this.connections.delete(key);
+      }
+    };
+  }
+}
+
+const sharedEventSource = new SharedEventSource();
+
 export function useEventStream(
   onEvent: (event: LiveEvent) => void,
   enabled: boolean = true,
@@ -39,42 +88,10 @@ export function useEventStream(
 
   useEffect(() => {
     if (!enabled) return;
-    const url = ambassadorId
-      ? `${API_BASE_URL}/stream?ambassadorId=${encodeURIComponent(ambassadorId)}`
-      : `${API_BASE_URL}/stream`;
-    const es = new EventSource(url);
 
-    es.onmessage = (msg) => {
-      // Default message event (no `event:` field) — ignore; we use named events.
-      if (msg.data) {
-        try {
-          cbRef.current({ type: "ping", ...JSON.parse(msg.data) } as LiveEvent);
-        } catch {
-          /* ignore */
-        }
-      }
-    };
+    const listener: Listener = (event) => cbRef.current(event);
+    const unsub = sharedEventSource.subscribe(listener, ambassadorId);
 
-    const handle = (e: MessageEvent) => {
-      let payload: Partial<LiveEvent> = {};
-      try {
-        payload = e.data ? JSON.parse(e.data) : {};
-      } catch {
-        /* ignore */
-      }
-      cbRef.current({ type: e.type as LiveEventType, ...payload } as LiveEvent);
-    };
-
-    (["leaderboard", "orders", "commission", "ambassador_created", "inbox", "pocs", "announcements", "tasks", "affiliate_urls", "commission_overrides", "applicants", "analytics", "connected", "ping"] as LiveEventType[]).forEach(
-      (type) => es.addEventListener(type, handle as EventListener),
-    );
-
-    es.onerror = () => {
-      // EventSource auto-reconnects; nothing to do here.
-    };
-
-    return () => {
-      es.close();
-    };
-  }, [enabled]);
+    return unsub;
+  }, [enabled, ambassadorId]);
 }

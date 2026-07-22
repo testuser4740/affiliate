@@ -1,0 +1,40 @@
+- generic [active] [ref=e1]:
+  - region "Notifications alt+T"
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - img "Gajab Ambassadors" [ref=e5]
+        - generic [ref=e6]: Gajab.
+      - generic [ref=e8]:
+        - generic [ref=e9]: ADMIN CONSOLE
+        - button "V1 V2" [ref=e10] [cursor=pointer]:
+          - generic [ref=e11]: V1
+          - generic [ref=e12]: V2
+      - navigation [ref=e13]:
+        - link "Applicants" [ref=e14] [cursor=pointer]:
+          - /url: /admin/applicants
+        - link "Directory" [ref=e19] [cursor=pointer]:
+          - /url: /admin/directory
+        - link "Affiliate URLs" [ref=e25] [cursor=pointer]:
+          - /url: /admin/affiliate-urls
+        - link "Tasks" [ref=e29] [cursor=pointer]:
+          - /url: /admin/tasks
+        - link "Leaderboard" [ref=e33] [cursor=pointer]:
+          - /url: /admin/leaderboard
+        - link "Commissions" [ref=e40] [cursor=pointer]:
+          - /url: /admin/utilization
+        - link "Announcements" [ref=e43] [cursor=pointer]:
+          - /url: /admin/announcements
+        - link "Support" [ref=e47] [cursor=pointer]:
+          - /url: /admin/support
+        - link "Analytics" [ref=e50] [cursor=pointer]:
+          - /url: /admin/analytics
+      - button "Exit Admin" [ref=e53] [cursor=pointer]
+    - main [ref=e57]:
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - generic [ref=e62]: Commission Overrides
+          - heading "Temporary commission campaigns" [level=1] [ref=e63]
+          - paragraph [ref=e64]: Boost commission % for a period. Auto-reverts when the window ends.
+        - button "New Override" [ref=e65] [cursor=pointer]
+  - alert [ref=e67]

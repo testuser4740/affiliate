@@ -1,0 +1,86 @@
+- generic [active] [ref=f16e1]:
+  - region "Notifications alt+T"
+  - generic [ref=f16e2]:
+    - complementary [ref=f16e3]:
+      - generic [ref=f16e4]:
+        - img "Gajab Ambassadors" [ref=f16e5]
+        - generic [ref=f16e6]: Gajab.
+      - generic [ref=f16e8]:
+        - generic [ref=f16e9]: ADMIN CONSOLE
+        - button "V1 V2" [ref=f16e10] [cursor=pointer]:
+          - generic [ref=f16e11]: V1
+          - generic [ref=f16e12]: V2
+      - navigation [ref=f16e13]:
+        - link "Applicants" [ref=f16e14] [cursor=pointer]:
+          - /url: /admin/applicants
+        - link "Directory" [ref=f16e19] [cursor=pointer]:
+          - /url: /admin/directory
+        - link "Affiliate URLs" [ref=f16e25] [cursor=pointer]:
+          - /url: /admin/affiliate-urls
+        - link "Tasks" [ref=f16e29] [cursor=pointer]:
+          - /url: /admin/tasks
+        - link "Leaderboard" [ref=f16e33] [cursor=pointer]:
+          - /url: /admin/leaderboard
+        - link "Commissions" [ref=f16e40] [cursor=pointer]:
+          - /url: /admin/utilization
+        - link "Announcements" [ref=f16e43] [cursor=pointer]:
+          - /url: /admin/announcements
+        - link "Support" [ref=f16e47] [cursor=pointer]:
+          - /url: /admin/support
+        - link "Analytics" [ref=f16e50] [cursor=pointer]:
+          - /url: /admin/analytics
+      - button "Exit Admin" [ref=f16e53] [cursor=pointer]
+    - main [ref=f16e57]:
+      - generic [ref=f16e59]:
+        - generic [ref=f16e60]:
+          - generic [ref=f16e61]: Commissions
+          - heading "Commissions & order utilization" [level=1] [ref=f16e62]
+          - paragraph [ref=f16e63]: Set base commission rates, run boost campaigns, and track every referral order.
+        - generic [ref=f16e64]:
+          - generic [ref=f16e65]:
+            - generic [ref=f16e66]:
+              - heading "Commission overrides" [level=3] [ref=f16e67]
+              - paragraph [ref=f16e72]: Boost commission for specific campaigns & periods. Overrides apply automatically to qualifying orders.
+            - generic [ref=f16e73]:
+              - textbox "Search campaign, ID..." [ref=f16e78]
+              - combobox [ref=f16e79]:
+                - option "All statuses" [selected]
+                - option "Active"
+                - option "Scheduled"
+                - option "Expired"
+              - button "New Override" [ref=f16e80] [cursor=pointer]
+          - table [ref=f16e83]:
+            - rowgroup [ref=f16e84]:
+              - row [ref=f16e85]:
+                - columnheader "ID" [ref=f16e86]
+                - columnheader "Campaign" [ref=f16e87]
+                - columnheader "Applies to" [ref=f16e88]
+                - columnheader "Original %" [ref=f16e89]
+                - columnheader "Override %" [ref=f16e90]
+                - columnheader "Start" [ref=f16e91]
+                - columnheader "End" [ref=f16e92]
+                - columnheader "Status" [ref=f16e93]
+                - columnheader [ref=f16e94]
+            - rowgroup
+        - generic [ref=f16e95]:
+          - generic [ref=f16e96]:
+            - generic [ref=f16e97]:
+              - heading "Order utilization log" [level=3] [ref=f16e98]
+              - paragraph [ref=f16e99]: Every order placed via a referral URL.
+            - generic [ref=f16e100]:
+              - textbox "Search code, order, customer..." [ref=f16e105]
+              - combobox [ref=f16e106]:
+                - option "All codes" [selected]
+          - table [ref=f16e108]:
+            - rowgroup [ref=f16e109]:
+              - row [ref=f16e110]:
+                - columnheader "Code" [ref=f16e111]
+                - columnheader "Order ID" [ref=f16e112]
+                - columnheader "Customer" [ref=f16e113]
+                - columnheader "Order Value" [ref=f16e114]
+                - columnheader "Used at" [ref=f16e115]
+                - columnheader "Discount" [ref=f16e116]
+                - columnheader "Commission %" [ref=f16e117]
+                - columnheader "Commission ₹" [ref=f16e118]
+            - rowgroup
+  - alert [ref=f16e119]

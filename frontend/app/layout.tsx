@@ -1,32 +1,24 @@
-"use client";
 import "@/index.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "sonner";
-import { VersionProvider } from "@/hooks/useVersion";
-import { AuthProvider } from "@/lib/auth";
-import { useState } from "react";
+import { Poppins } from "next/font/google";
+import Providers from "@/components/Providers";
 
-export default function RootLayout({ children }) {
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 60_000,
-        refetchOnWindowFocus: false,
-      },
-    },
-  }));
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-poppins",
+});
 
+export const metadata = {
+  title: "Gajab Affiliate",
+  description: "Gajab Affiliate Dashboard",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <VersionProvider>
-              <Toaster position="top-center" richColors />
-              {children}
-            </VersionProvider>
-          </AuthProvider>
-        </QueryClientProvider>
+      <body className={poppins.variable}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

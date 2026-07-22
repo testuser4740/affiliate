@@ -1,25 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Gajab Brand Tokens — Orange + Navy */
-    --background: 32 100% 97%;            /* cream surface */
-    --foreground: 221 50% 18%;            /* navy text */
+    --background: 32 100% 97%;
+    --foreground: 221 50% 18%;
     --card: 0 0% 100%;
     --card-foreground: 221 50% 18%;
     --popover: 0 0% 100%;
     --popover-foreground: 221 50% 18%;
-    --primary: 18 90% 53%;                /* Gajab Orange #F26B1F */
+    --primary: 18 90% 53%;
     --primary-foreground: 0 0% 100%;
     --secondary: 32 100% 95%;
     --secondary-foreground: 221 50% 18%;
     --muted: 32 50% 95%;
     --muted-foreground: 221 20% 40%;
-    --accent: 45 100% 62%;                /* Warm Yellow #FFC93C */
+    --accent: 45 100% 62%;
     --accent-foreground: 221 50% 18%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -41,20 +38,18 @@
   html, body { @apply bg-background text-foreground; }
   body {
     margin: 0;
-    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #FFF7EE;
-    background-image: radial-gradient(circle at 1px 1px, rgba(27,45,84,0.05) 1px, transparent 0);
-    background-size: 24px 24px;
   }
   h1, h2, h3, h4 {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-poppins), sans-serif;
     font-weight: 800;
     letter-spacing: -0.02em;
   }
   .font-display {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-poppins), sans-serif;
     font-weight: 800;
     letter-spacing: -0.02em;
   }
@@ -63,17 +58,18 @@
 
 @layer components {
   .gajab-card {
-    @apply bg-white rounded-2xl border border-[#EFEAE0] shadow-[0_2px_8px_rgba(27,45,84,0.06)] transition-all;
+    @apply bg-white rounded-2xl border border-[#EFEAE0] shadow-[0_2px_8px_rgba(27,45,84,0.06)];
+    transition: box-shadow 0.2s ease;
   }
   .gajab-card:hover {
-    @apply shadow-[0_8px_24px_rgba(27,45,84,0.10)];
+    box-shadow: 0 4px 16px rgba(27,45,84,0.08);
   }
   .gajab-card-soft {
     @apply bg-white rounded-2xl border border-[#F0EBE2] shadow-sm;
   }
   .gajab-sticker {
     @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-poppins), sans-serif;
   }
   .gajab-sticker-yellow {
     @apply gajab-sticker bg-[#FFF1C2] text-[#1B2D54] border border-[#FFC93C]/50;

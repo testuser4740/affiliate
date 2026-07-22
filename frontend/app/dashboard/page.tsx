@@ -1,9 +1,10 @@
 "use client";
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
 import { MousePointerClick, ShoppingBag, PackageCheck, TrendingUp, IndianRupee, Trophy, Repeat, UserPlus, XOctagon, PackageX, Calendar, Users, ShieldCheck, Target, Hand } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import ShareRow from "@/components/ShareRow";
 import TierProgress from "@/components/TierProgress";
+const TrendChart = dynamic(() => import("@/components/TrendChart"), { ssr: false });
 import { useVersion } from "@/hooks/useVersion";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
@@ -145,15 +146,7 @@ export default function Home() {
             <span className="gajab-sticker-yellow text-[10px]">+18% vs last week</span>
           </div>
           <div className="h-56">
-            <ResponsiveContainer>
-              <LineChart data={trendData}>
-                <CartesianGrid stroke="#EAE6E1" strokeDasharray="4 4" />
-                <XAxis dataKey="day" stroke="#1A1A1A" fontWeight="700" fontSize={12} />
-                <YAxis stroke="#1A1A1A" fontSize={12} />
-                <Tooltip contentStyle={{borderRadius:12, border:"2px solid #1A1A1A"}} />
-                <Line type="monotone" dataKey="revenue" stroke="#F26B1F" strokeWidth={3} dot={{r:5, fill:"#FFC93C", stroke:"#1A1A1A", strokeWidth:2}} />
-              </LineChart>
-            </ResponsiveContainer>
+            <TrendChart data={trendData} />
           </div>
         </div>
         <div className="gajab-card p-5 bg-gradient-to-br from-[#FFC93C] to-[#FFB81C]">

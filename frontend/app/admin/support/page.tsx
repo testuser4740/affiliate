@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Plus, Edit, Trash2, X, ArrowLeft, Mail, Phone, MessageCircle, UserPlus, UserMinus, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useVersion } from "@/hooks/useVersion";
-import { get } from "@/lib/api";
+import { get, post, put, del } from "@/lib/api";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
 
@@ -11,24 +11,58 @@ export default function AdminSupport() {
   const { isV2 } = useVersion();
   const pocs = useBackend(() => get("/admin/pocs").then(r => (r as any).data ?? []), [], [], ["pocs"]);
   const leaderboard = useBackend(() => backend.masterLeaderboard().then(r => r.data), [], [], ["leaderboard", "orders", "commission", "ambassador_created"]);
-  const [editing, setEditing] = useState(null);
-  const [detail, setDetail] = useState(null);
+  const [editing, setEditing] = useState<any>(null);
+  const [detail, setDetail] = useState<any>(null);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: "", role: "", region: "", email: "", phone: "", whatsapp: "", workingHours: "" });
   const [mapQuery, setMapQuery] = useState("");
   const [linkedSet, setLinkedSet] = useState<Set<string>>(new Set());
 
   const openCreate = () => { setEditing(null); setForm({ name: "", role: "", region: "", email: "", phone: "", whatsapp: "", workingHours: "" }); setOpen(true); };
-  const openEdit = (p) => { setEditing(p); setForm({ name: p.name, role: p.role, region: p.region, email: p.email, phone: p.phone, whatsapp: p.whatsapp, workingHours: p.workingHours }); setOpen(true); };
-  const save = (e) => { e.preventDefault(); if (!form.name) { toast.error("Name required"); return; } toast.success(editing ? `Updated ${form.name}` : `Created POC ${form.name}`); setOpen(false); };
-  const del = (p) => toast.success(`Deleted ${p.name}`);
+  const openEdit = (p: any) => { setEditing(p); setForm({ name: p.name, role: p.role, region: p.region, email: p.email, phone: p.phone, whatsapp: p.whatsapp, workingHours: p.workingHours }); setOpen(true); };
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name) { toast.error("Name required"); return; }
+    try {
+      if (editing) {
+        await put(`/admin/pocs/${editing.id}`, form);
+        toast.success(`Updated ${form.name}`);
+      } else {
+        await post("/admin/pocs", form);
+        toast.success(`Created POC ${form.name}`);
+      }
+      setOpen(false);
+    } catch (err) {
+      toast.error("Save failed");
+    }
+  };
+  const del = async (p: any) => {
+    try {
+      await del(`/admin/pocs/${p.id}`);
+      toast.success(`Deleted ${p.name}`);
+      if (detail?.id === p.id) setDetail(null);
+    } catch (err) {
+      toast.error("Delete failed");
+    }
+  };
 
-  const openDetail = (p) => { setDetail(p); setLinkedSet(new Set(p.linkedAffiliates)); setMapQuery(""); };
-  const toggleLink = (name) => {
+  const openDetail = (p: any) => { setDetail(p); setLinkedSet(new Set(p.linkedAffiliates ?? [])); setMapQuery(""); };
+  const toggleLink = async (name: string) => {
     const s = new Set(linkedSet);
-    if (s.has(name)) { s.delete(name); toast.success(`Unmapped ${name}`); }
-    else { s.add(name); toast.success(`Mapped ${name} to ${detail.name}`); }
+    if (s.has(name)) {
+      s.delete(name);
+      toast.success(`Unmapped ${name}`);
+    } else {
+      s.add(name);
+      toast.success(`Mapped ${name} to ${detail.name}`);
+    }
     setLinkedSet(s);
+    try {
+      await backend.updatePocAmbassadors(detail.id, [...s]);
+      setDetail((prev: any) => ({ ...prev, linkedAffiliates: [...s] }));
+    } catch (err) {
+      toast.error("Failed to update mapping");
+    }
   };
 
   if (detail) {

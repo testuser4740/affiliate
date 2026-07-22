@@ -11,6 +11,7 @@ export class NotificationService {
     @Logger(__filename) private log: LoggerInterface,
   ) {}
 
+  async send(input: { from: string; subject: string; preview?: string; body: string; priority?: string }): Promise<InboxMessage> {
     const msg = this.repository.repository.create({
       id: `MSG-${Date.now()}`,
       from: input.from,

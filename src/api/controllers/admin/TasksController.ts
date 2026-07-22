@@ -43,6 +43,19 @@ export class TaskController {
     return this.service.list({ status, q });
   }
 
+  /**
+   * @openapi
+   * /admin/tasks/submissions:
+   *   get:
+   *     tags: [Admin / Tasks]
+   *     summary: List task submissions
+   */
+  @Get("/submissions")
+  @ResponseSchema(TaskSubmission, { isArray: true })
+  async submissions(@QueryParam("status") status?: string): Promise<ApiList<TaskSubmission>> {
+    return this.service.submissions(status);
+  }
+
   @Get("/:id")
   @ResponseSchema(Task)
   async get(@Param("id") id: string): Promise<Task> {
@@ -71,6 +84,32 @@ export class TaskController {
 
   /**
    * @openapi
+   * /admin/tasks/submissions/{submissionId}/review:
+   *   post:
+   *     tags: [Admin / Tasks]
+   *     summary: Review a submission (approve/reject/resubmit)
+   *     requestBody:
+   *       required: true
+   *       content: {
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/ReviewSubmissionInput'
+   *       }
+   */
+  @Post("/submissions/:submissionId/review")
+  @ResponseSchema(TaskSubmission)
+  async review(@Param("submissionId") submissionId: string, @Body() body: ReviewSubmissionInput): Promise<TaskSubmission> {
+    return this.service.review(submissionId, body);
+  }
+
+  @Post("/:id/assign")
+  @ResponseSchema(TaskSubmission)
+  async assign(@Param("id") id: string, @Body() body: AssignTaskInput): Promise<TaskSubmission> {
+    return this.service.assign(id, body);
+  }
+
+  /**
+   * @openapi
    * /admin/tasks/{id}:
    *   put:
    *     tags: [Admin / Tasks]
@@ -93,58 +132,5 @@ export class TaskController {
   @OnUndefined(204)
   async remove(@Param("id") id: string): Promise<void> {
     return this.service.remove(id);
-  }
-
-  /**
-   * @openapi
-   * /admin/tasks/{id}/assign:
-   *   post:
-   *     tags: [Admin / Tasks]
-   *     summary: Assign a task to an ambassador (creates a submission)
-   *     requestBody:
-   *       required: true
-   *       content: {
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/AssignTaskInput'
-   *       }
-   */
-  @Post("/:id/assign")
-  @ResponseSchema(TaskSubmission)
-  async assign(@Param("id") id: string, @Body() body: AssignTaskInput): Promise<TaskSubmission> {
-    return this.service.assign(id, body);
-  }
-
-  /**
-   * @openapi
-   * /admin/tasks/submissions:
-   *   get:
-   *     tags: [Admin / Tasks]
-   *     summary: List task submissions
-   */
-  @Get("/submissions")
-  @ResponseSchema(TaskSubmission, { isArray: true })
-  async submissions(@QueryParam("status") status?: string): Promise<ApiList<TaskSubmission>> {
-    return this.service.submissions(status);
-  }
-
-  /**
-   * @openapi
-   * /admin/tasks/submissions/{submissionId}/review:
-   *   post:
-   *     tags: [Admin / Tasks]
-   *     summary: Review a submission (approve/reject/resubmit)
-   *     requestBody:
-   *       required: true
-   *       content: {
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/ReviewSubmissionInput'
-   *       }
-   */
-  @Post("/submissions/:submissionId/review")
-  @ResponseSchema(TaskSubmission)
-  async review(@Param("submissionId") submissionId: string, @Body() body: ReviewSubmissionInput): Promise<TaskSubmission> {
-    return this.service.review(submissionId, body);
   }
 }

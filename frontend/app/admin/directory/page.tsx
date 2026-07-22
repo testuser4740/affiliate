@@ -172,7 +172,7 @@ export default function Directory() {
       </div>
 
       <div className="gajab-card p-0 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-[#FFF7EE] border-b border-[#EFEAE0]"><tr className="text-left text-[10px] font-extrabold uppercase tracking-wider text-[#5A6378]">
               <th className="p-3">#</th><th className="p-3">Ambassador</th><th className="p-3">College</th><th className="p-3">City</th><th className="p-3">State</th><th className="p-3">Level</th><th className="p-3">Affiliate URL</th><th className="p-3 text-right">Orders</th><th className="p-3 text-right">Revenue</th><th className="p-3">Actions</th>
@@ -197,6 +197,33 @@ export default function Directory() {
               })}
             </tbody>
           </table>
+        </div>
+        <div className="sm:hidden space-y-2 p-3">
+          {filtered.map(r => {
+            const tier = tierFor(r.revenue);
+            return (
+              <div key={r.rank} onClick={()=>setDetail(r)} className="p-3 rounded-xl border border-[#EFEAE0] bg-white cursor-pointer hover:border-[#F26B1F]/40 transition-colors" data-testid={`directory-row-mobile-${r.rank}`}>
+                <div className="flex items-center gap-3">
+                  <img src={r.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-display text-sm">#{r.rank}</span>
+                      <p className="font-bold truncate">{r.name}</p>
+                    </div>
+                    <p className="text-xs text-[#5A6378] truncate">{r.college} · {r.city}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-display text-sm">₹{(r.revenue/1000).toFixed(0)}K</p>
+                    <p className="text-xs text-[#5A6378]">{r.orders} orders</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-dashed border-[#EFEAE0]">
+                  <span className="gajab-sticker bg-[#FFF1C2] text-[#92400E] border border-[#FFC93C]/60 text-[9px]">{tier}</span>
+                  <button onClick={e=>{e.stopPropagation(); setMsgOpen(r)}} className="text-xs font-bold text-[#F26B1F] px-2 py-1 rounded-lg" data-testid={`msg-${r.rank}`}><MessageSquare className="w-3 h-3 inline mr-1" />Message</button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

@@ -1,13 +1,14 @@
 "use client";
 import React, { useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend } from "recharts";
+import dynamic from "next/dynamic";
 import { Filter, Search, ShoppingBag, Repeat } from "lucide-react";
+
+const AnalyticsBarChart = dynamic(() => import("@/components/AnalyticsCharts").then(m => m.AnalyticsBarChart), { ssr: false });
+const AnalyticsPieChart = dynamic(() => import("@/components/AnalyticsCharts").then(m => m.AnalyticsPieChart), { ssr: false });
 import { useVersion } from "@/hooks/useVersion";
 import { useBackend } from "@/lib/useBackend";
 import { backend } from "@/lib/apiHooks";
 import { states, cities } from "@/data/options";
-
-const COLORS = ["#F26B1F", "#FFC93C"];
 
 const Kpi = ({ label, value, sub, bg }) => (
   <div className={`gajab-card p-5 ${bg}`}><p className="text-xs uppercase font-extrabold tracking-wider opacity-70">{label}</p><p className="font-display text-4xl mt-1">{value}</p>{sub && <p className="text-xs text-[#5A6378] mt-1">{sub}</p>}</div>
@@ -88,12 +89,8 @@ export default function Analytics() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-5">
-        <div className="gajab-card p-5 lg:col-span-2"><h3 className="font-display text-lg mb-3">Revenue trend ({frequency})</h3>
-          <div className="h-72"><ResponsiveContainer><BarChart data={trendData.length ? trendData : []}><CartesianGrid stroke="#EFEAE0" strokeDasharray="4 4" /><XAxis dataKey="day" stroke="#1B2D54" fontWeight="700" /><YAxis stroke="#1B2D54" /><Tooltip contentStyle={{borderRadius:12, border:"1px solid #EFEAE0"}} /><Bar dataKey="revenue" fill="#F26B1F" radius={[8,8,0,0]} /></BarChart></ResponsiveContainer></div>
-        </div>
-        <div className="gajab-card p-5"><h3 className="font-display text-lg mb-3">Conversion comparison</h3>
-          <div className="h-72"><ResponsiveContainer><PieChart><Pie data={convData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label>{convData.map((_, i) => <Cell key={i} fill={COLORS[i]} stroke="#1B2D54" strokeWidth={2} />)}</Pie><Legend /></PieChart></ResponsiveContainer></div>
-        </div>
+        <AnalyticsBarChart data={trendData} frequency={frequency} />
+        <AnalyticsPieChart data={convData} />
       </div>
 
       {/* New vs Repeat orders */}
