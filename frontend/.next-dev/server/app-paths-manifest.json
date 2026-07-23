@@ -1,13 +1,4 @@
 {
-  "/admin/tasks/page": "app/admin/tasks/page.js",
-  "/dashboard/tasks/page": "app/dashboard/tasks/page.js",
-  "/admin/applicants/page": "app/admin/applicants/page.js",
-  "/dashboard/payouts/page": "app/dashboard/payouts/page.js",
-  "/dashboard/leaderboard/page": "app/dashboard/leaderboard/page.js",
-  "/dashboard/announcements/page": "app/dashboard/announcements/page.js",
-  "/dashboard/performance/page": "app/dashboard/performance/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/admin/analytics/page": "app/admin/analytics/page.js",
-  "/admin/support/page": "app/admin/support/page.js",
-  "/admin/announcements/page": "app/admin/announcements/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/directory/page": "app/admin/directory/page.js"
 }

@@ -5,8 +5,8 @@ import { Tier } from "../models/tiers";
 import { AmbassadorRepository } from "../repositories/AmbassadorRepository";
 import { TierRepository } from "../repositories/TierRepository";
 import { CommissionService } from "./commission.service";
-import { NotFoundError } from "../errors";
-import { UpdateAmbassadorInput } from "../../dto/ambassador.dto";
+import { NotFoundError, ConflictError } from "../errors";
+import { CreateAmbassadorInput, UpdateAmbassadorInput } from "../../dto/ambassador.dto";
 import { liveBus } from "../lib/eventBus";
 
 export interface AmbassadorFilter {
@@ -50,6 +50,40 @@ export class AmbassadorService {
     });
     if (!ambassador) throw new NotFoundError(`Ambassador ${id} not found`);
     return ambassador;
+  }
+
+  async create(input: CreateAmbassadorInput): Promise<Ambassador> {
+    const repo = this.repository.repository;
+    const existing = await repo.findOne({ where: { email: input.email } });
+    if (existing) throw new ConflictError("Ambassador already exists for this email");
+
+    const maxRankResult = await repo
+      .createQueryBuilder("a")
+      .select("MAX(a.rank)", "maxRank")
+      .getRawOne();
+    const nextRank = Number(maxRankResult?.maxRank ?? 0) + 1;
+
+    const tierName = input.tier ?? "Bronze";
+    const tierRecord = await this.tierRepository.repository.findOne({ where: { name: tierName } });
+
+    const ambassador = repo.create({
+      id: `amb_${Date.now().toString(36)}`,
+      name: input.name,
+      college: input.college,
+      city: input.city,
+      state: input.state,
+      email: input.email,
+      phone: input.phone,
+      avatar: input.avatar,
+      tier: tierRecord ?? undefined,
+      commissionPct: input.commissionPct ?? 8,
+      revenue: 0,
+      orders: 0,
+      rank: nextRank,
+    } as Partial<Ambassador>);
+    const saved = await repo.save(ambassador);
+    liveBus.broadcast({ type: "leaderboard" });
+    return saved;
   }
 
   async update(id: string, input: UpdateAmbassadorInput): Promise<Ambassador> {

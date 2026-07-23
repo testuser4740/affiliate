@@ -1,8 +1,9 @@
 // Typed accessors for the Gajab backend API.
 // Each returns the raw backend shape; pages fall back to mockData on error.
-import { api, get, post, put, del, ApiList } from "./api";
+import { api, get, post, put, del, downloadBlob, ApiList } from "./api";
 import { CreateCommissionOverrideInput, UpdateCommissionOverrideInput } from "./dto/commission-override.dto";
 import { CreateAnnouncementInput, UpdateAnnouncementInput } from "./dto/announcement.dto";
+import { CreatePocInput, UpdatePocInput } from "./dto/poc.dto";
 
 export interface Poc {
   id: string;
@@ -154,6 +155,8 @@ export const backend = {
     post<Ambassador>(`/admin/applicants/${id}/convert`, body),
   listAmbassadors: (tier?: string, state?: string, city?: string, q?: string) =>
     get<ApiList<Ambassador>>("/admin/ambassadors", { tier, state, city, q }),
+  createAmbassador: (body: { name: string; email: string; phone: string; college: string; city: string; state: string; commissionPct?: number; tier?: string }) =>
+    post<Ambassador>("/admin/ambassadors", body),
   masterLeaderboard: (state?: string) =>
     get<ApiList<Ambassador>>("/admin/ambassadors/leaderboard", { state }),
   analyticsKpis: () => get<Record<string, number>>("/admin/analytics/kpis"),
@@ -178,6 +181,14 @@ export const backend = {
     get<ApiList<AffiliateUrl>>("/admin/affiliate-urls", { ambassadorId, channel, q }),
   updatePocAmbassadors: (pocId: string, linkedAffiliates: string[]) =>
     post<Poc>(`/admin/pocs/${pocId}/ambassadors`, { linkedAffiliates }),
+  listPocs: (region?: string, role?: string, q?: string) =>
+    get<ApiList<Poc>>("/admin/pocs", { region, role, q }),
+  createPoc: (body: CreatePocInput) =>
+    post<Poc>("/admin/pocs", body),
+  updatePoc: (id: string, body: UpdatePocInput) =>
+    put<Poc>(`/admin/pocs/${id}`, body),
+  deletePoc: (id: string) =>
+    del<void>(`/admin/pocs/${id}`),
 
   // Ambassador
   ambassadorHome: (id: string) => get<{ ambassador: Ambassador; stats: any; urls: any[]; recentOrders: any[] }>(`/ambassador/${id}/home`),
@@ -198,6 +209,13 @@ export const backend = {
     post<any>(`/ambassador/${ambassadorId}/tasks/${taskId}/submit`, body),
   sendMessage: (ambassadorId: string, body: { from: string; subject: string; body: string }) =>
     post<InboxMessage>(`/admin/ambassadors/${ambassadorId}/inbox`, body),
+
+  // Reports
+  downloadAmbassadorList: () =>
+    downloadBlob(
+      "/admin/reports/ambassadors/download",
+      `ambassadors-${new Date().toISOString().slice(0, 10)}.xlsx`,
+    ),
 };
 
 export { api };

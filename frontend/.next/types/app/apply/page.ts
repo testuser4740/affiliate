@@ -1,4 +1,4 @@
-// File: /home/pt046-gowri-golang/Desktop/Documents/affliate_project/frontend/app/apply/page.tsx
+// File: /home/pt064-dhinakar-nodejs/Documents/MyFiles/chandrukumar/AffliatedProject/affiliate/frontend/app/apply/page.tsx
 import * as entry from '../../../../app/apply/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

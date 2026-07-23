@@ -58,3 +58,21 @@ export async function del<T>(url: string): Promise<T> {
   const res = await api.delete<T>(url);
   return res.data;
 }
+
+/**
+ * Download a binary response (blob) from the given URL.
+ * Triggers a browser file-save automatically.
+ */
+export async function downloadBlob(url: string, filename: string): Promise<void> {
+  const res = await api.get(url, { responseType: "blob" });
+  const blob = new Blob([res.data], {
+    type: res.headers["content-type"] ?? "application/octet-stream",
+  });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(link.href);
+}

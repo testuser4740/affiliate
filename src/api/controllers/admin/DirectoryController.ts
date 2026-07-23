@@ -13,7 +13,7 @@ import { ResponseSchema } from "routing-controllers-openapi";
 import { Ambassador } from "../../models/ambassadors";
 import { AmbassadorService } from "../../services/ambassador.service";
 import { ApiList } from "../../types";
-import { UpdateAmbassadorInput } from "../../../dto/ambassador.dto";
+import { CreateAmbassadorInput, UpdateAmbassadorInput } from "../../../dto/ambassador.dto";
 import { InboxMessage } from "../../models/inbox-messages";
 import { InboxService } from "../../services/inbox.service";
 
@@ -61,6 +61,12 @@ export class AmbassadorController {
   @ResponseSchema(Ambassador)
   async get(@Param("id") id: string): Promise<Ambassador> {
     return this.service.getById(id);
+  }
+
+  @Post("/")
+  @ResponseSchema(Ambassador)
+  async create(@Body({ validate: true }) body: CreateAmbassadorInput): Promise<Ambassador> {
+    return this.service.create(body);
   }
 
   /**
