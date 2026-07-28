@@ -1,13 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import { Download, Search, Filter, MousePointerClick, Users, ShoppingBag, IndianRupee, TrendingUp, Wallet } from "lucide-react";
+import { Download, Search, Filter, MousePointerClick, Users, ShoppingBag, IndianRupee, TrendingUp, Wallet, Inbox } from "lucide-react";
 import { toast } from "sonner";
 import { useVersion } from "@/hooks/useVersion";
 import { useAuth } from "@/lib/auth";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
-
-const DEMO_AMB_ID = "amb_005";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
 
 const buyerNames = ["Rahul K.", "Anita P.", "Deepak S.", "Neha R.", "Aman T.", "Priya J.", "Kiran M.", "Sanjay B.", "Rohan D.", "Meera S."];
 const maskPhone = (p) => p.slice(0, 4) + " ***** " + p.slice(-2);
@@ -37,15 +37,62 @@ const payoutBadge = (s) => {
   return "bg-[#F3F4F6] text-[#374151] border-[#D1D5DB]";
 };
 
+function PerformanceSkeleton({ isV2 }: { isV2?: boolean }) {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-80" />
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="gajab-card p-5 space-y-2">
+            <Skeleton className="w-11 h-11 rounded-full" />
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-8 w-20" />
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center gap-2 flex-wrap">
+        <Skeleton className="h-10 flex-1 min-w-[220px] max-w-md rounded-lg" />
+        <Skeleton className="h-10 w-32 rounded-lg" />
+        <Skeleton className="h-10 w-20 rounded-lg" />
+      </div>
+      <div className="gajab-card p-0 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-[#FFF7EE] border-b border-[#EFEAE0]">
+              <tr className="text-left text-[10px] font-bold uppercase tracking-wider text-[#5A6378]">
+                <th className="p-3">Order ID</th><th className="p-3">Date</th><th className="p-3">Product</th><th className="p-3">Category</th>{isV2 && <th className="p-3 text-right">Qty</th>}<th className="p-3">{isV2 ? "Buyer" : "Via Link"}</th><th className="p-3 text-right">Order ₹</th><th className="p-3 text-right">Comm %</th><th className="p-3 text-right">Comm ₹</th><th className="p-3">Order</th><th className="p-3">Payout</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <tr key={i} className="border-b border-[#F0EBE2]">
+                  {Array.from({ length: 10 }).map((_, j) => (
+                    <td key={j} className="p-3"><Skeleton className="h-4 w-full" /></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Performance() {
   const { isV2 } = useVersion();
   const { user } = useAuth();
-  const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
+  const ambId = user?.ambassadorId;
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState("All");
 
   const commissionHistory = useBackend(() => backend.ambassadorHome(ambId).then(r => r.recentOrders ?? []), [], [ambId], ["commission"], ambId);
   const urls = useBackend(() => backend.ambassadorHome(ambId).then(r => r.urls ?? []), [], [ambId], ["leaderboard", "orders", "affiliate_urls"], ambId);
+  const perfLoading = getLoading(commissionHistory, []) || getLoading(urls, []);
 
   const filtered = commissionHistory
     .filter(o => filter === "All" || o.status === filter)
@@ -57,6 +104,8 @@ export default function Performance() {
   }), { orders: 0, value: 0, commission: 0, paid: 0 });
 
   const aggr = urls.reduce((a, u) => ({ clicks: a.clicks + (u.clicks ?? 0), signups: a.signups + (u.signups ?? 0) }), { clicks: 0, signups: 0 });
+
+  if (perfLoading) return <PerformanceSkeleton isV2={isV2} />;
 
   return (
     <div className="space-y-5">
@@ -99,8 +148,10 @@ export default function Performance() {
                 <th className="p-3">Order ID</th><th className="p-3">Date</th><th className="p-3">Product</th>{isV2 && <th className="p-3 text-right">Qty</th>}<th className="p-3">Category</th><th className="p-3">{isV2 ? "Buyer" : "Via Link"}</th><th className="p-3 text-right">Order ₹</th><th className="p-3 text-right">Comm %</th><th className="p-3 text-right">Comm ₹</th><th className="p-3">Order</th><th className="p-3">Payout</th>
               </tr>
             </thead>
-            <tbody>
-              {filtered.map((o, idx) => (
+             <tbody>
+               {filtered.length === 0 ? (
+                 <tr><td colSpan={isV2 ? 11 : 10} className="p-12 text-center text-[#5A6378]"><Inbox className="w-10 h-10 mx-auto mb-2 opacity-40" /><p className="font-bold text-lg">No data found</p><p className="text-sm">Try adjusting your search or filter criteria</p></td></tr>
+               ) : filtered.map((o, idx) => (
                 <tr key={o.id} className="border-b border-[#F0EBE2] hover:bg-[#FFF7EE]" data-testid={`perf-row-${o.id}`}>
                   <td className="p-3 font-mono text-xs">{o.id}</td>
                   <td className="p-3 text-xs">{o.date}</td>
@@ -118,8 +169,10 @@ export default function Performance() {
             </tbody>
           </table>
         </div>
-        <div className="sm:hidden space-y-2 p-3">
-          {filtered.map((o, idx) => (
+         <div className="sm:hidden space-y-2 p-3">
+           {filtered.length === 0 ? (
+             <div className="p-12 text-center text-[#5A6378]"><Inbox className="w-10 h-10 mx-auto mb-2 opacity-40" /><p className="font-bold text-lg">No data found</p><p className="text-sm">Try adjusting your search or filter criteria</p></div>
+           ) : filtered.map((o, idx) => (
             <div key={o.id} className="p-3 rounded-xl border border-[#EFEAE0] bg-white space-y-2" data-testid={`perf-row-mobile-${o.id}`}>
               <div className="flex items-center justify-between">
                 <span className="font-mono text-xs text-[#5A6378]">{o.id}</span>

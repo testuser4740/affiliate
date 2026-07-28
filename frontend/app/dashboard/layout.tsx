@@ -10,8 +10,6 @@ import { useAuth } from "@/lib/auth";
 import { useBackend } from "@/lib/useBackend";
 import { backend } from "@/lib/apiHooks";
 
-const DEMO_AMB_ID = "amb_005";
-
 const mainNav = [
   { to: "/dashboard", icon: Home, label: "Home", end: true },
   { to: "/dashboard/inbox", icon: Mail, label: "Inbox" },
@@ -33,12 +31,13 @@ export default function AmbassadorLayout({ children }) {
   const navg = useRouter();
   const { user, isAuthenticated, loading, logout } = useAuth();
   const [menu, setMenu] = useState(false);
-  const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
+  const ambId = user?.ambassadorId;
 
   const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission", "ambassador_created"], ambId);
   const inboxMessages = useBackend(() => backend.ambassadorInbox(ambId), [], [ambId], ["inbox", "ambassador_created", "pocs", "announcements", "tasks"], ambId);
 
   const unread = inboxMessages.filter(m=>!m.read).length;
+  console.log("Unread messages:", unread, inboxMessages);
   const tier = tiers.find(t => t.name === (ambassador?.tier?.name ?? "Bronze")) || tiers[0];
   const inTop10 = (ambassador?.rank ?? 0) <= 10;
 

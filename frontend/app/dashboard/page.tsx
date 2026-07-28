@@ -9,8 +9,7 @@ import { useVersion } from "@/hooks/useVersion";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
 import { useAuth } from "@/lib/auth";
-
-const DEMO_AMB_ID = "amb_005";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const maskPhone = (p) => p.slice(0, 4) + " ***** " + p.slice(-2);
 const buyers = ["Rahul K.", "Anita P.", "Deepak S.", "Neha R.", "Aman T."];
@@ -23,12 +22,69 @@ const Stat = ({ icon: Icon, label, value, bg }) => (
   </div>
 );
 
+function HomeSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-80" />
+      </div>
+      <div className="gajab-card p-3 sm:p-4">
+        <div className="flex items-center gap-3 flex-wrap">
+          <Skeleton className="h-8 w-24 rounded-lg" />
+          <Skeleton className="h-8 w-24 rounded-lg" />
+          <Skeleton className="h-8 w-24 rounded-lg" />
+        </div>
+      </div>
+      <div className="gajab-card p-5 sm:p-6 bg-[#1B2D54] text-white space-y-4">
+        <Skeleton className="h-4 w-32 bg-white/20" />
+        <Skeleton className="h-8 w-96 bg-white/20" />
+        <div className="mt-4 pt-4 border-t border-white/15">
+          <Skeleton className="h-3 w-32 bg-white/20 mb-2" />
+          <div className="flex gap-2">
+            <Skeleton className="h-9 flex-1 rounded-lg bg-white/10" />
+            <Skeleton className="h-9 w-24 rounded-lg bg-white/10" />
+          </div>
+        </div>
+      </div>
+      <div className="space-y-3">
+        <Skeleton className="h-4 w-24" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="gajab-card p-4 space-y-2">
+              <Skeleton className="w-5 h-5" />
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-6 w-12" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="gajab-card p-5">
+        <Skeleton className="h-64 w-full rounded-lg" />
+      </div>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <div className="gajab-card p-5 space-y-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-8 w-20" />
+          <Skeleton className="h-3 w-40" />
+        </div>
+        <div className="gajab-card p-5 space-y-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-8 w-20" />
+          <Skeleton className="h-3 w-40" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const { isV2 } = useVersion();
   const { user } = useAuth();
   const [period, setPeriod] = useState("Monthly");
 
-  const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
+  const ambId = user?.ambassadorId;
 
   const home = useBackend(
     () => backend.ambassadorHome(ambId),
@@ -43,6 +99,8 @@ export default function Home() {
   const affiliateLink = home?.urls?.[0]?.url ?? "";
 
   const trendData = stats?.trend ?? [];
+
+  if (home === null) return <HomeSkeleton />;
 
   return (
     <div className="space-y-5">

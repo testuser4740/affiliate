@@ -1,14 +1,61 @@
 "use client";
 import React, { useState } from "react";
-import { Search, Users, ShoppingBag, TrendingUp, Upload, Download, Plus, MessageSquare, X, ExternalLink, ArrowLeft, Trophy, ListChecks, IndianRupee, Award, Gift, FileText, Copy, CheckCircle2 } from "lucide-react";
+import { Search, Users, ShoppingBag, TrendingUp, Upload, Download, Plus, MessageSquare, X, ExternalLink, ArrowLeft, Trophy, ListChecks, IndianRupee, Award, Gift, FileText, Copy, CheckCircle2, Inbox } from "lucide-react";
 import { toast } from "sonner";
 import { states, cities } from "@/data/options";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
 
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
+
 const Kpi = ({ icon: Icon, label, value, bg }) => (
   <div className={`gajab-card p-5 ${bg}`}><Icon className="w-6 h-6 mb-2" strokeWidth={2.5} /><p className="text-xs uppercase font-extrabold tracking-wider opacity-70">{label}</p><p className="font-display text-3xl mt-1">{value}</p></div>
 );
+
+function DirectorySkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-96" />
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="gajab-card p-5 space-y-2"><Skeleton className="h-10 w-10 rounded-full" /><Skeleton className="h-3 w-24" /><Skeleton className="h-8 w-12" /></div>
+        <div className="gajab-card p-5 space-y-2"><Skeleton className="h-10 w-10 rounded-full" /><Skeleton className="h-3 w-24" /><Skeleton className="h-8 w-12" /></div>
+        <div className="gajab-card p-5 space-y-2"><Skeleton className="h-10 w-10 rounded-full" /><Skeleton className="h-3 w-24" /><Skeleton className="h-8 w-12" /></div>
+        <div className="gajab-card p-5 space-y-2"><Skeleton className="h-10 w-10 rounded-full" /><Skeleton className="h-3 w-24" /><Skeleton className="h-8 w-12" /></div>
+      </div>
+      <div className="gajab-card p-4 grid lg:grid-cols-5 gap-3">
+        <Skeleton className="h-10 lg:col-span-2 rounded-lg" />
+        <Skeleton className="h-10 rounded-lg" />
+        <Skeleton className="h-10 rounded-lg" />
+        <Skeleton className="h-10 rounded-lg" />
+      </div>
+      <div className="gajab-card p-0 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-[#FFF7EE] border-b border-[#EFEAE0]">
+              <tr className="text-left text-[10px] font-extrabold uppercase tracking-wider text-[#5A6378]">
+                <th className="p-3">#</th><th className="p-3">Ambassador</th><th className="p-3">College</th><th className="p-3">City</th><th className="p-3">State</th><th className="p-3">Level</th><th className="p-3">Affiliate URL</th><th className="p-3 text-right">Orders</th><th className="p-3 text-right">Revenue</th><th className="p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <tr key={i} className="border-b border-[#F0EBE2]">
+                  {Array.from({ length: 10 }).map((_, j) => (
+                    <td key={j} className="p-3"><Skeleton className="h-4 w-full" /></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const tierFor = (rev) => rev >= 400000 ? "Platinum" : rev >= 150000 ? "Gold" : rev >= 50000 ? "Silver" : "Bronze";
 
@@ -41,6 +88,7 @@ export default function Directory() {
 
   const leaderboard = useBackend(() => backend.listAmbassadors().then(r => r.data), [], [refreshKey], ["leaderboard", "orders", "commission"]);
   const adminKpis = useBackend(() => backend.analyticsKpis().then(r => r), {}, [], ["analytics"]);
+  const directoryLoading = getLoading(leaderboard, []) || getLoading(adminKpis, {});
 
   const handleDownload = async () => {
     setDownloading(true);
@@ -193,6 +241,8 @@ export default function Directory() {
   }
   // ================================================================
 
+  if (directoryLoading) return <DirectorySkeleton />;
+
   return (
     <div className="space-y-5">
       <div className="flex items-end justify-between flex-wrap gap-3">
@@ -228,8 +278,10 @@ export default function Directory() {
             <thead className="bg-[#FFF7EE] border-b border-[#EFEAE0]"><tr className="text-left text-[10px] font-extrabold uppercase tracking-wider text-[#5A6378]">
               <th className="p-3">#</th><th className="p-3">Ambassador</th><th className="p-3">College</th><th className="p-3">City</th><th className="p-3">State</th><th className="p-3">Level</th><th className="p-3">Affiliate URL</th><th className="p-3 text-right">Orders</th><th className="p-3 text-right">Revenue</th><th className="p-3">Actions</th>
             </tr></thead>
-            <tbody>
-              {filtered.map(r => {
+             <tbody>
+               {filtered.length === 0 ? (
+                 <tr><td colSpan={10} className="p-12 text-center text-[#5A6378]"><Inbox className="w-10 h-10 mx-auto mb-2 opacity-40" /><p className="font-bold text-lg">No data found</p><p className="text-sm">Try adjusting your search or filter criteria</p></td></tr>
+               ) : filtered.map(r => {
                 const tier = tierFor(r.revenue);
                 return (
                   <tr key={r.rank} onClick={() => setDetail(r)} className="border-b border-[#F0EBE2] hover:bg-[#FFF7EE] cursor-pointer" data-testid={`directory-row-${r.rank}`}>
@@ -250,7 +302,9 @@ export default function Directory() {
           </table>
         </div>
         <div className="sm:hidden space-y-2 p-3">
-          {filtered.map(r => {
+           {filtered.length === 0 ? (
+             <div className="p-12 text-center text-[#5A6378]"><Inbox className="w-10 h-10 mx-auto mb-2 opacity-40" /><p className="font-bold text-lg">No data found</p><p className="text-sm">Try adjusting your search or filter criteria</p></div>
+           ) : filtered.map(r => {
             const tier = tierFor(r.revenue);
             return (
               <div key={r.rank} onClick={() => setDetail(r)} className="p-3 rounded-xl border border-[#EFEAE0] bg-white cursor-pointer hover:border-[#F26B1F]/40 transition-colors" data-testid={`directory-row-mobile-${r.rank}`}>

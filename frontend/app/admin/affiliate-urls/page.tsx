@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import { Search, ExternalLink, MousePointerClick, ShoppingBag, IndianRupee, Link as LinkIcon } from "lucide-react";
+import { Search, ExternalLink, MousePointerClick, ShoppingBag, IndianRupee, Link as LinkIcon, Inbox } from "lucide-react";
 import { useBackend } from "@/lib/useBackend";
 import { backend } from "@/lib/apiHooks";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
 
 const channelColor = {
   "All": "bg-[#FFF1C2] text-[#92400E] border-[#FFC93C]/60",
@@ -19,11 +21,57 @@ const Kpi = ({ icon: Icon, label, value, accent }) => (
   </div>
 );
 
+function AffiliateUrlsSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-80" />
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="gajab-card p-5 space-y-2">
+            <Skeleton className="h-10 w-10 rounded-lg" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-8 w-16" />
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center gap-3 flex-wrap">
+        <Skeleton className="h-10 flex-1 min-w-[260px] max-w-md rounded-lg" />
+        <Skeleton className="h-10 w-40 rounded-lg" />
+      </div>
+      <div className="gajab-card p-0 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-[#FFF7EE] border-b border-[#EFEAE0]">
+              <tr className="text-left text-[10px] font-bold uppercase tracking-wider text-[#5A6378]">
+                <th className="p-3">URL ID</th><th className="p-3">Ambassador</th><th className="p-3">College</th><th className="p-3">Label</th><th className="p-3">URL</th><th className="p-3">Channel</th><th className="p-3 text-right">Clicks</th><th className="p-3 text-right">Signups</th><th className="p-3 text-right">Orders</th><th className="p-3 text-right">Revenue</th><th className="p-3 text-right">Commission</th><th className="p-3">Last Click</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <tr key={i} className="border-b border-[#F0EBE2]">
+                  {Array.from({ length: 12 }).map((_, j) => (
+                    <td key={j} className="p-3"><Skeleton className="h-4 w-full" /></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminAffiliateUrls() {
   const [q, setQ] = useState("");
   const [chan, setChan] = useState("All");
 
   const urls = useBackend(() => backend.listAffiliateUrls(undefined, chan === "All" ? undefined : chan, q || undefined).then(r => r.data), [], [], ["affiliate_urls", "leaderboard", "orders"]);
+  const loading = getLoading(urls, []);
 
   const filtered = urls.filter(u => {
     const ambName = u.ambassador?.name ?? u.ambassadorId ?? "";
@@ -37,6 +85,8 @@ export default function AdminAffiliateUrls() {
     revenue: a.revenue + Number(u.revenue ?? 0),
     commission: a.commission + Number(u.commission ?? 0),
   }), { clicks: 0, signups: 0, orders: 0, revenue: 0, commission: 0 });
+
+  if (loading) return <AffiliateUrlsSkeleton />;
 
   return (
     <div className="space-y-5">
@@ -72,7 +122,9 @@ export default function AdminAffiliateUrls() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(u => {
+              {filtered.length === 0 ? (
+                <tr><td colSpan={12} className="p-12 text-center text-[#5A6378]"><Inbox className="w-10 h-10 mx-auto mb-2 opacity-40" /><p className="font-bold text-lg">No data found</p><p className="text-sm">Try adjusting your search or filter criteria</p></td></tr>
+              ) : filtered.map(u => {
                 const ambName = u.ambassador?.name ?? u.ambassadorId ?? "—";
                 return (
                 <tr key={u.id} className="border-b border-[#F0EBE2] hover:bg-[#FFF7EE]" data-testid={`admin-url-row-${u.id}`}>

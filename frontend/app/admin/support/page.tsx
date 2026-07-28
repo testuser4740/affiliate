@@ -3,14 +3,48 @@ import React, { useState } from "react";
 import { Plus, Edit, Trash2, X, ArrowLeft, Mail, Phone, MessageCircle, UserPlus, UserMinus, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useVersion } from "@/hooks/useVersion";
-import { get, post, put, del } from "@/lib/api";
+import { get, post, put } from "@/lib/api";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
+
+function AdminSupportSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-96" />
+      </div>
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="gajab-card p-5 space-y-3">
+            <div className="flex items-start gap-3">
+              <Skeleton className="w-14 h-14 rounded-2xl flex-shrink-0" />
+              <div className="flex-1 min-w-0 space-y-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-[#EFEAE0] grid grid-cols-2 gap-2">
+              <Skeleton className="h-3 w-full rounded" />
+              <Skeleton className="h-3 w-full rounded" />
+            </div>
+            <Skeleton className="h-4 w-32 mt-2" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function AdminSupport() {
   const { isV2 } = useVersion();
   const pocs = useBackend(() => get("/admin/pocs").then(r => (r as any).data ?? []), [], [], ["pocs"]);
   const leaderboard = useBackend(() => backend.masterLeaderboard().then(r => r.data), [], [], ["leaderboard", "orders", "commission", "ambassador_created"]);
+  const supportLoading = getLoading(pocs, []) || getLoading(leaderboard, []);
   const [editing, setEditing] = useState<any>(null);
   const [detail, setDetail] = useState<any>(null);
   const [open, setOpen] = useState(false);
@@ -64,6 +98,8 @@ export default function AdminSupport() {
       toast.error("Failed to update mapping");
     }
   };
+
+  if (supportLoading) return <AdminSupportSkeleton />;
 
   if (detail) {
     const candidates = leaderboard.filter(a => a.name.toLowerCase().includes(mapQuery.toLowerCase())).filter(a => !isV2 || !linkedSet.has(a.name));

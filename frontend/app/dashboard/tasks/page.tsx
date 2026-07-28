@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
 import { useAuth } from "@/lib/auth";
-
-const DEMO_AMB_ID = "amb_005";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
 
 const tabs = ["Pending Review", "Under Review", "Rejected", "Approved"];
 
@@ -18,15 +18,50 @@ const tabLabel: Record<string, string> = {
   "Approved": "Approved",
 };
 
+function TasksSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-80" />
+      </div>
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-10 w-32 rounded-lg flex-shrink-0" />
+        ))}
+      </div>
+      <div className="grid gap-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="gajab-card p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-12 rounded" />
+              <Skeleton className="h-5 w-24 rounded-full" />
+            </div>
+            <Skeleton className="h-6 w-2/3" />
+            <Skeleton className="h-4 w-full" />
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Tasks() {
   const nav = useRouter();
   const { user } = useAuth();
-  const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
+  const ambId = user?.ambassadorId;
   const [active, setActive] = useState("Pending Review");
   const [openId, setOpenId] = useState(null);
   const [proof, setProof] = useState("");
 
   const tasks = useBackend(() => backend.listTasks(ambId), [], [ambId], ["tasks"], ambId);
+  const tasksLoading = getLoading(tasks, []);
+
   const filtered = tasks.filter(t => active === "Pending Review" ? (t.status === "Pending Review" || t.status === "Resubmitted") : t.status === active);
   const submit = async (taskId) => {
     if (!proof.trim()) { toast.error("Add a link or note"); return; }
@@ -40,6 +75,8 @@ export default function Tasks() {
     }
   };
   const Icon = active === "Pending Review" ? Clock : active === "Under Review" ? AlertCircle : active === "Rejected" ? XCircle : CheckCircle2;
+
+  if (tasksLoading) return <TasksSkeleton />;
 
   return (
     <div className="space-y-5">

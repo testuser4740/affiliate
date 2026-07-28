@@ -9,10 +9,62 @@ import { useVersion } from "@/hooks/useVersion";
 import { useBackend } from "@/lib/useBackend";
 import { backend } from "@/lib/apiHooks";
 import { states, cities } from "@/data/options";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
 
 const Kpi = ({ label, value, sub, bg }) => (
   <div className={`gajab-card p-5 ${bg}`}><p className="text-xs uppercase font-extrabold tracking-wider opacity-70">{label}</p><p className="font-display text-4xl mt-1">{value}</p>{sub && <p className="text-xs text-[#5A6378] mt-1">{sub}</p>}</div>
 );
+
+function AnalyticsSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+      </div>
+      <div className="gajab-card p-4 grid lg:grid-cols-4 gap-3">
+        <div className="space-y-2"><Skeleton className="h-3 w-16 mb-1" /><Skeleton className="h-10 w-full rounded-lg" /></div>
+        <div className="space-y-2"><Skeleton className="h-3 w-12 mb-1" /><Skeleton className="h-10 w-full rounded-lg" /></div>
+        <div className="space-y-2"><Skeleton className="h-3 w-8 mb-1" /><Skeleton className="h-10 w-full rounded-lg" /></div>
+        <div className="space-y-2"><Skeleton className="h-3 w-10 mb-1" /><Skeleton className="h-10 w-full rounded-lg" /></div>
+      </div>
+      <div className="gajab-card p-4 space-y-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Skeleton className="h-4 w-40" />
+          <Skeleton className="h-10 flex-1 min-w-[240px] max-w-md rounded-lg" />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className={`gajab-card p-5 space-y-2 ${["bg-[#FFE9D9]", "bg-[#FFF1C2]", "bg-[#D1FAE5]", "bg-[#E0E7FF]"][i]}`}>
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-10 w-20" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+        ))}
+      </div>
+      <div className="grid lg:grid-cols-3 gap-5">
+        <div className="gajab-card p-5"><Skeleton className="h-64 w-full rounded-lg" /></div>
+        <div className="gajab-card p-5"><Skeleton className="h-64 w-full rounded-lg" /></div>
+      </div>
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div className="gajab-card p-6 bg-gradient-to-br from-[#E0E7FF] to-white space-y-2">
+          <Skeleton className="h-10 w-10 rounded-lg" />
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-12 w-24" />
+          <Skeleton className="h-3 w-48" />
+        </div>
+        <div className="gajab-card p-6 bg-gradient-to-br from-[#FFE9D9] to-white space-y-2">
+          <Skeleton className="h-10 w-10 rounded-lg" />
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-12 w-24" />
+          <Skeleton className="h-3 w-48" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Analytics() {
   const { isV2 } = useVersion();
@@ -26,6 +78,7 @@ export default function Analytics() {
   const adminKpis = useBackend(() => backend.analyticsKpis().then(r => r), {}, [], ["analytics"]);
   const trendData = useBackend(() => backend.analyticsTrend().then(r => r), [], [], ["orders", "analytics"]);
   const leaderboard = useBackend(() => backend.masterLeaderboard().then(r => r.data), [], [], ["leaderboard", "orders", "commission", "ambassador_created"]);
+  const analyticsLoading = getLoading(adminKpis, {}) || getLoading(trendData, []) || getLoading(leaderboard, []);
 
   const convData = adminKpis.conversionWithRef !== undefined ? [{ name: "With Referral", value: adminKpis.conversionWithRef }, { name: "Without Referral", value: adminKpis.conversionWithoutRef }] : [];
 
@@ -35,6 +88,8 @@ export default function Analytics() {
 
   // Derive stats from selected scope
   const activeAmbName = selectedAmb ? selectedAmb.name : "";
+
+  if (analyticsLoading) return <AnalyticsSkeleton />;
 
   return (
     <div className="space-y-5">

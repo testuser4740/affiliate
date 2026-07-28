@@ -2,7 +2,7 @@
   "app/admin/analytics/page.tsx -> @/components/AnalyticsCharts": {
     "id": 42542,
     "files": [
-      "static/chunks/2221.89a6ad7219e85a7d.js",
+      "static/chunks/2221.1cdc20983270178b.js",
       "static/chunks/9123.5ea02b77281ce68e.js",
       "static/chunks/2542.135cbc7a5107aa60.js"
     ]
@@ -16,7 +16,7 @@
   "app/dashboard/page.tsx -> @/components/TrendChart": {
     "id": 27542,
     "files": [
-      "static/chunks/2221.89a6ad7219e85a7d.js",
+      "static/chunks/2221.1cdc20983270178b.js",
       "static/chunks/7542.8f21a874e64bbe0f.js"
     ]
   }

@@ -1,1 +1,13 @@
-{}
+{
+  "/admin/applicants/page": "app/admin/applicants/page.js",
+  "/admin/directory/page": "app/admin/directory/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/tier/page": "app/dashboard/tier/page.js",
+  "/admin/affiliate-urls/page": "app/admin/affiliate-urls/page.js",
+  "/admin/tasks/page": "app/admin/tasks/page.js",
+  "/admin/leaderboard/page": "app/admin/leaderboard/page.js",
+  "/admin/utilization/page": "app/admin/utilization/page.js",
+  "/admin/announcements/page": "app/admin/announcements/page.js",
+  "/admin/support/page": "app/admin/support/page.js",
+  "/admin/analytics/page": "app/admin/analytics/page.js"
+}

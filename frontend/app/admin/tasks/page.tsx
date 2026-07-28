@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import DateInputDDMMYYYY from "@/components/DateInputDDMMYYYY";
 import { get, post } from "@/lib/api";
 import { useBackend } from "@/lib/useBackend";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
 
 interface Task {
   id: string;
@@ -36,6 +38,64 @@ const statusClr = {
   "Under Review": "bg-[#FEF3C7] text-[#92400E] border-[#92400E]/40",
   "Resubmitted": "bg-[#E0E7FF] text-[#3730A3] border-[#3730A3]/30",
 };
+
+function AdminTasksSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-96" />
+      </div>
+      <div className="gajab-card p-4 grid lg:grid-cols-3 gap-3">
+        <Skeleton className="h-10 lg:col-span-2 rounded-lg" />
+        <Skeleton className="h-10 rounded-lg" />
+      </div>
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="gajab-card p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-12 rounded" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-5 w-16 rounded-full" />
+              </div>
+            </div>
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+            <div className="flex justify-between items-end">
+              <div className="space-y-1">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-4 w-20" />
+              </div>
+              <div className="space-y-1">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-5 w-10" />
+              </div>
+            </div>
+            <Skeleton className="h-2 w-full rounded-full" />
+          </div>
+        ))}
+      </div>
+      <div className="gajab-card p-5 space-y-3">
+        <Skeleton className="h-6 w-48" />
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="p-3 rounded-xl border border-[#EFEAE0] flex items-center justify-between gap-3">
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-40" />
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="h-9 w-9 rounded-lg" />
+              <Skeleton className="h-9 w-20 rounded-lg" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function AdminTasks() {
   const [detail, setDetail] = useState(null);
@@ -76,6 +136,7 @@ export default function AdminTasks() {
 
   const tasks = useBackend<Task[]>(() => get("/admin/tasks").then(r => (r as any).data), [], [], ["tasks"]);
   const submissions = useBackend<TaskSubmission[]>(() => get("/admin/tasks/submissions").then(r => (r as any).data), [], [], ["tasks"]);
+  const tasksLoading = getLoading(tasks, []) || getLoading(submissions, []);
 
   const adminPendingTasks = submissions.filter(s => s.status === "Under Review" || s.status === "Resubmitted");
   const assigneesByTask: Record<string, TaskSubmission[]> = {};
@@ -87,6 +148,8 @@ export default function AdminTasks() {
   const filtered = tasks
     .filter(t => filter === "All" || t.status === filter)
     .filter(t => (t.title + t.description + t.id).toLowerCase().includes(q.toLowerCase()));
+
+  if (tasksLoading) return <AdminTasksSkeleton />;
 
   const create = async (e) => {
     e.preventDefault();

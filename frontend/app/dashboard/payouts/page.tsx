@@ -4,8 +4,8 @@ import { Wallet, Clock, Filter, Gift, Award, FileText, Sparkles, Info } from "lu
 import { useAuth } from "@/lib/auth";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
-
-const DEMO_AMB_ID = "amb_005";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
 
 const rewards = [
   { id: "RW-01", title: "Gajab Welcome Kit", desc: "Received on onboarding · Feb 2026", icon: Gift, tone: "bg-[#FFE9D9] text-[#C9450C]" },
@@ -13,12 +13,86 @@ const rewards = [
   { id: "RW-03", title: "Founder Letter of Recommendation", desc: "Pending — 60 more orders to unlock", icon: FileText, tone: "bg-[#E8E4FB] text-[#5B21B6]" },
 ];
 
+function PayoutsSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-64" />
+      </div>
+      <div className="gajab-card p-4 bg-[#FFF1C2] border-[#FFC93C]/60 flex items-start gap-3">
+        <Skeleton className="w-5 h-5 rounded flex-shrink-0 mt-0.5" />
+        <div className="space-y-2 flex-1">
+          <Skeleton className="h-4 w-64" />
+          <Skeleton className="h-3 w-80" />
+        </div>
+      </div>
+      <div className="grid sm:grid-cols-3 gap-4">
+        <div className="gajab-card p-5 bg-gradient-to-br from-[#FFC93C] to-[#FFB81C] sm:col-span-2 space-y-3">
+          <Skeleton className="h-6 w-6 bg-white/30" />
+          <Skeleton className="h-3 w-32 bg-white/30" />
+          <Skeleton className="h-12 w-32 bg-white/30" />
+          <Skeleton className="h-3 w-48 bg-white/30" />
+        </div>
+        <div className="gajab-card p-5 space-y-3">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-10 w-20" />
+          <Skeleton className="h-4 w-full bg-[#EFEAE0]" />
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-6 w-16" />
+        </div>
+      </div>
+      <div className="flex items-center gap-2 flex-wrap">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-9 w-40 rounded-lg" />
+      </div>
+      <div className="gajab-card p-5 space-y-3">
+        <Skeleton className="h-5 w-40" />
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="p-4 rounded-xl border border-[#EFEAE0]">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-48" />
+              </div>
+              <div className="text-right space-y-2">
+                <Skeleton className="h-6 w-20 ml-auto" />
+                <Skeleton className="h-3 w-16 ml-auto" />
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-dashed border-[#EFEAE0] grid grid-cols-3 gap-2">
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="gajab-card p-5 space-y-3">
+        <Skeleton className="h-5 w-48" />
+        <div className="grid sm:grid-cols-3 gap-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="p-4 rounded-xl border border-[#EFEAE0] space-y-2">
+              <Skeleton className="h-10 w-10 rounded-lg" />
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-48" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Payouts() {
   const { user } = useAuth();
-  const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
+  const ambId = user?.ambassadorId;
   const [filter, setFilter] = useState("All months");
 
   const payouts = useBackend(() => backend.ambassadorPayouts(ambId), [], [ambId], ["commission", "orders"], ambId);
+  const payoutsLoading = getLoading(payouts, []);
+
   const months = ["All months", ...Array.from(new Set(payouts.map(p => p.month)))];
   const labelOf = (m) => {
     if (m === "All months") return m;
@@ -31,6 +105,8 @@ export default function Payouts() {
   const paidOut = stats?.paidCommission ?? 0;
 
   const filtered = filter === "All months" ? payouts : payouts.filter(p => p.month === filter);
+
+  if (payoutsLoading || stats === null) return <PayoutsSkeleton />;
 
   return (
     <div className="space-y-5">

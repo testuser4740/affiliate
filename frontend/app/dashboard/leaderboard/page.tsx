@@ -4,8 +4,8 @@ import { Crown, Trophy, Medal, MapPin, Globe, Sparkles, X } from "lucide-react";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
 import { useAuth } from "@/lib/auth";
-
-const DEMO_AMB_ID = "amb_005";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
 
 const PodiumCard = ({ rank, name, college, revenue, avatar, color, icon: Icon }) => (
   <div className={`gajab-card p-3 sm:p-4 text-center ${color} flex flex-col justify-end`}>
@@ -20,15 +20,54 @@ const PodiumCard = ({ rank, name, college, revenue, avatar, color, icon: Icon })
 
 const scopes = ["Overall", "My State", "My City"];
 
+function LeaderboardSkeleton() {
+  return (
+    <div className="space-y-5 pb-20">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-80" />
+      </div>
+      <div className="flex gap-2">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-10 w-28 rounded-lg" />
+        ))}
+      </div>
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <Skeleton className="gajab-card p-3 sm:p-4 h-32" />
+        <Skeleton className="gajab-card p-3 sm:p-4 h-40" />
+        <Skeleton className="gajab-card p-3 sm:p-4 h-32" />
+      </div>
+      <div className="gajab-card p-2 sm:p-3">
+        <div className="space-y-2">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="grid grid-cols-12 items-center px-3 py-3">
+              <Skeleton className="col-span-1 h-5 w-8" />
+              <div className="col-span-6 sm:col-span-5 flex items-center gap-3">
+                <Skeleton className="w-9 h-9 rounded-full" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+              <Skeleton className="hidden sm:block sm:col-span-2 h-4 w-16" />
+              <Skeleton className="hidden sm:block sm:col-span-2 h-4 w-16" />
+              <Skeleton className="col-span-5 sm:col-span-2 text-right h-5 w-12 ml-auto" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Leaderboard() {
   const { user } = useAuth();
-  const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
+  const ambId = user?.ambassadorId;
   const [scope, setScope] = useState("Overall");
   const [showTop10Popup, setShowTop10Popup] = useState(false);
   const firedRef = useRef(false);
 
   const leaderboard = useBackend(() => backend.publicLeaderboard().then(r => r), [], [], ["leaderboard", "orders", "commission", "ambassador_created"]);
   const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission"], ambId);
+  const leaderboardLoading = getLoading(leaderboard, []) || ambassador === null;
 
   const ambState = ambassador?.state ?? "";
   const ambCity = ambassador?.city ?? "";
@@ -40,7 +79,6 @@ export default function Leaderboard() {
   const ranked = data.map((r, i) => ({ ...r, displayRank: i + 1, isYou: r.id === ambId }));
   const [first, second, third, ...rest] = ranked;
 
-  // Fire confetti & popup if ambassador is in top-10 in the current scope
   useEffect(() => {
     const yourEntry = ranked.find(r => r.isYou);
     if (yourEntry && yourEntry.displayRank <= 10 && !firedRef.current) {
@@ -62,6 +100,8 @@ export default function Leaderboard() {
       });
     }
   }, [ranked]);
+
+  if (leaderboardLoading) return <LeaderboardSkeleton />;
 
   const yourRank = ranked.find(r => r.isYou)?.displayRank || ambRank;
 

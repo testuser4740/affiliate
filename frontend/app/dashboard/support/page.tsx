@@ -6,17 +6,51 @@ import { useBackend } from "@/lib/useBackend";
 import { backend } from "@/lib/apiHooks";
 import { useAuth } from "@/lib/auth";
 import { get } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
 
-const DEMO_AMB_ID = "amb_005";
+function SupportSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-80" />
+      </div>
+      <div className="grid sm:grid-cols-2 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="gajab-card p-5 space-y-3">
+            <div className="flex items-start gap-3">
+              <Skeleton className="w-14 h-14 rounded-2xl flex-shrink-0" />
+              <div className="flex-1 min-w-0 space-y-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+            </div>
+            <div className="mt-3 grid grid-cols-1 gap-2">
+              <Skeleton className="h-8 w-full rounded-lg" />
+              <Skeleton className="h-8 w-full rounded-lg" />
+              <Skeleton className="h-8 w-full rounded-lg" />
+            </div>
+            <Skeleton className="h-3 w-32 mt-3" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Support() {
   const { isV2 } = useVersion();
   const { user } = useAuth();
-  const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
+  const ambId = user?.ambassadorId;
   const pocs = useBackend(() => get("/admin/pocs").then(r => (r as any).data), [], [], ["pocs"]);
   const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission"], ambId);
+  const supportLoading = getLoading(pocs, []) || ambassador === null;
   const myPocs = pocs.filter(p => p.linkedAffiliates.includes(ambassador?.name ?? ""));
   const others = pocs.filter(p => !p.linkedAffiliates.includes(ambassador?.name ?? ""));
+  if (supportLoading) return <SupportSkeleton />;
   return (
     <div className="space-y-5">
       <div>

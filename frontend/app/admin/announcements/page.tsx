@@ -1,11 +1,13 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Plus, Edit, Trash2, X, Bell, Send, Megaphone, Clock, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useVersion } from "@/hooks/useVersion";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
 import { useAuth } from "@/lib/auth";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
 
 const priorityClr = { High: "bg-[#FEE2E2] text-[#991B1B]", Medium: "bg-[#FEF3C7] text-[#92400E]", Low: "bg-[#E0E7FF] text-[#3730A3]" };
 
@@ -14,6 +16,7 @@ export default function AdminAnnouncements() {
   const { user } = useAuth();
   const announcements = useBackend(() => backend.listAnnouncements().then(r => r.data), [], [], ["announcements"]);
   const ambassadors = useBackend(() => backend.listAmbassadors().then(r => r.data), [], [], ["ambassadors"]);
+  const announcementsLoading = getLoading(announcements, []) || getLoading(ambassadors, []);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ title: "", body: "", audience: "All Ambassadors", priority: "Medium", tier: "", city: "", state: "" });
@@ -54,6 +57,33 @@ export default function AdminAnnouncements() {
       toast.error("Failed to delete announcement");
     }
   };
+
+  if (announcementsLoading) return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-96" />
+      </div>
+      <div className="grid gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="gajab-card p-5 space-y-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Skeleton className="h-4 w-4 rounded" />
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-5 w-16 rounded-full" />
+            </div>
+            <Skeleton className="h-5 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+            <div className="flex flex-wrap gap-3">
+              <Skeleton className="h-3 w-32" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-5">

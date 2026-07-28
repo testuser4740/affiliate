@@ -1,10 +1,45 @@
 "use client";
 import React, { useState } from "react";
-import { Search, Medal } from "lucide-react";
+import { Search, Medal, Inbox } from "lucide-react";
 import { states, cities } from "@/data/options";
 import { useVersion } from "@/hooks/useVersion";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
+
+function LeaderboardSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-80" />
+      </div>
+      <div className="gajab-card p-0 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-[#1B2D54] text-white">
+              <tr className="text-left text-[10px] font-extrabold uppercase tracking-wider">
+                <th className="p-3">Rank</th><th className="p-3">Ambassador</th><th className="p-3">College</th>{Array.from({ length: 6 }).map((_, i) => <th key={i} className="p-3"><Skeleton className="h-3 w-16 bg-white/20 inline-block" /></th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <tr key={i} className="border-b border-[#EFEAE0]">
+                  {Array.from({ length: 9 }).map((_, j) => (
+                    <td key={j} className="p-3"><Skeleton className="h-4 w-full" /></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function MasterLeaderboard() {
   const { isV2 } = useVersion();
@@ -14,11 +49,14 @@ export default function MasterLeaderboard() {
   const [duration, setDuration] = useState("All time");
 
   const leaderboard = useBackend(() => backend.masterLeaderboard().then(r => r.data), [], [], ["leaderboard", "orders", "commission", "ambassador_created"]);
+  const loading = getLoading(leaderboard, []);
 
   const filtered = leaderboard
     .filter(r => !isV2 || stateF === "All States" || r.state === stateF)
     .filter(r => !isV2 || cityF === "All Cities" || r.city === cityF)
     .filter(r => !isV2 || (r.name + r.college + r.city + r.state).toLowerCase().includes(q.toLowerCase()));
+
+  if (loading) return <LeaderboardSkeleton />;
 
   return (
     <div className="space-y-5">
@@ -35,8 +73,10 @@ export default function MasterLeaderboard() {
         <thead className="bg-[#1B2D54] text-white"><tr className="text-left text-[10px] font-extrabold uppercase tracking-wider">
           <th className="p-3">Rank</th><th className="p-3">Ambassador</th><th className="p-3">College</th>{isV2 && <><th className="p-3">City</th><th className="p-3">State</th></>}<th className="p-3 text-right">Orders</th><th className="p-3 text-right">Revenue Generated</th>
         </tr></thead>
-        <tbody>
-          {filtered.map(r => (
+         <tbody>
+           {filtered.length === 0 ? (
+             <tr><td colSpan={isV2 ? 7 : 5} className="p-12 text-center text-[#5A6378]"><Inbox className="w-10 h-10 mx-auto mb-2 opacity-40" /><p className="font-bold text-lg">No data found</p><p className="text-sm">Try adjusting your search or filter criteria</p></td></tr>
+           ) : filtered.map(r => (
             <tr key={r.rank} className={`border-b border-[#EFEAE0] ${r.rank<=3?"bg-[#FFF1C2]":""}`} data-testid={`master-row-${r.rank}`}>
               <td className="p-3">
                 {r.rank<=3 ? (

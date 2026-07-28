@@ -7,12 +7,50 @@ import { states, cities } from "@/data/options";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 const statusClr = {
   "Approved": "bg-[#D1FAE5] text-[#065F46] border-[#065F46]/40",
   "Rejected": "bg-[#FEE2E2] text-[#991B1B] border-[#991B1B]/40",
   "Pending": "bg-[#FEF3C7] text-[#92400E] border-[#92400E]/40",
   "Partially Approved": "bg-[#FFE9D9] text-[#C9450C] border-[#F26B1F]/40",
 };
+
+function ApplicantsSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-96" />
+      </div>
+      <div className="flex items-center gap-3 flex-wrap">
+        <Skeleton className="h-10 flex-1 min-w-[260px] max-w-md rounded-lg" />
+        <Skeleton className="h-10 w-40 rounded-lg" />
+      </div>
+      <div className="gajab-card p-0 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-[#FFF7EE] border-b border-[#EFEA0]">
+              <tr className="text-left text-[10px] font-bold uppercase tracking-wider text-[#5A6378]">
+                <th className="p-3">ID</th><th className="p-3">Name</th><th className="p-3">Phone</th><th className="p-3">College</th><th className="p-3">City</th><th className="p-3">State</th><th className="p-3">Applied</th><th className="p-3">Status</th><th className="p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <tr key={i} className="border-b border-[#F0EBE2]">
+                  {Array.from({ length: 9 }).map((_, j) => (
+                    <td key={j} className="p-3"><Skeleton className="h-4 w-full" /></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Applicants() {
   const nav = useRouter();
@@ -39,6 +77,8 @@ export default function Applicants() {
     .filter(a => stateFilter === "All States" || a.state === stateFilter)
     .filter(a => cityFilter === "All Cities" || a.city === cityFilter)
     .filter(a => (a.name+a.college+a.city+a.email+a.state).toLowerCase().includes(q.toLowerCase()));
+
+  if (loading) return <ApplicantsSkeleton />;
 
   const open = (a) => { setSel(a); setComments(a.comments || ""); };
   const act = async (kind) => {

@@ -1,11 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import { Plus, Edit, Trash2, X, Percent, Calendar, Search, Check } from "lucide-react";
+import { Plus, Edit, Trash2, X, Percent, Calendar, Search, Check, Inbox } from "lucide-react";
 import { toast } from "sonner";
 import DateInputDDMMYYYY from "@/components/DateInputDDMMYYYY";
 import { useVersion } from "@/hooks/useVersion";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getLoading } from "@/lib/loading";
 
 interface UtilRow {
   code: string;
@@ -35,6 +37,73 @@ const overrideStatusClr = {
   "Expired": "bg-[#F3EFE9] text-[#5A6378] border-[#EFEAE0]",
 };
 
+function UtilizationSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-96" />
+      </div>
+      <div className="gajab-card p-5 space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-3 w-64" />
+          </div>
+          <div className="flex gap-2 flex-wrap items-center">
+            <Skeleton className="h-10 w-56 rounded-lg" />
+            <Skeleton className="h-10 w-40 rounded-lg" />
+            <Skeleton className="h-10 w-36 rounded-lg" />
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-[#FFF7EE] border-b border-[#EFEAE0]">
+              <tr className="text-left text-[10px] font-extrabold uppercase tracking-wider text-[#5A6378]">
+                <th className="p-3">ID</th><th className="p-3">Campaign</th><th className="p-3">Applies to</th><th className="p-3 text-right">Original %</th><th className="p-3 text-right">Override %</th><th className="p-3">Start</th><th className="p-3">End</th><th className="p-3">Status</th><th className="p-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <tr key={i} className="border-b border-[#F0EBE2]">
+                  {Array.from({ length: 9 }).map((_, j) => (
+                    <td key={j} className="p-3"><Skeleton className="h-4 w-full" /></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="gajab-card p-0 overflow-hidden">
+        <div className="p-5 pb-3">
+          <Skeleton className="h-6 w-48 mb-1" />
+          <Skeleton className="h-3 w-64" />
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-[#FFF7EE] border-b border-[#EFEAE0]">
+              <tr className="text-left text-[10px] font-extrabold uppercase tracking-wider text-[#5A6378]">
+                <th className="p-3">Code</th><th className="p-3">Order ID</th><th className="p-3">Customer</th><th className="p-3 text-right">Order Value</th><th className="p-3">Used at</th><th className="p-3 text-right">Discount</th><th className="p-3 text-right">Commission %</th><th className="p-3 text-right">Commission ₹</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <tr key={i} className="border-b border-[#F0EBE2]">
+                  {Array.from({ length: 8 }).map((_, j) => (
+                    <td key={j} className="p-3"><Skeleton className="h-4 w-full" /></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Utilization() {
   const { isV2 } = useVersion();
   const [open, setOpen] = useState(false);
@@ -58,6 +127,7 @@ export default function Utilization() {
     commissionValue: Number(u.commission ?? 0),
   }));
   const commissionOverrides = useBackend<Override[]>(() => backend.listCommissionOverrides().then(r => r.data), [], [], ["commission_overrides"]);
+  const utilLoading = getLoading(rawUtil, []) || getLoading(commissionOverrides, []);
 
   const filteredUtil = referralUtilization.filter(u => !isV2 || (u.code + u.orderId + u.customerId).toLowerCase().includes(uq.toLowerCase())).filter(u => !isV2 || ufilter === "All codes" || u.code === ufilter);
   const filteredOverrides = commissionOverrides.filter(o => !isV2 || (o.id + o.label + o.appliesTo).toLowerCase().includes(oq.toLowerCase())).filter(o => !isV2 || ostatus === "All statuses" || o.status === ostatus);
@@ -107,6 +177,8 @@ export default function Utilization() {
     }
   };
 
+  if (utilLoading) return <UtilizationSkeleton />;
+
   return (
     <div className="space-y-5">
       <div>
@@ -129,8 +201,10 @@ export default function Utilization() {
             <thead className="bg-[#FFF7EE] border-b border-[#EFEAE0]"><tr className="text-left text-[10px] font-extrabold uppercase tracking-wider text-[#5A6378]">
               <th className="p-3">ID</th><th className="p-3">Campaign</th><th className="p-3">Applies to</th><th className="p-3 text-right">Original %</th><th className="p-3 text-right">Override %</th><th className="p-3">Start</th><th className="p-3">End</th><th className="p-3">Status</th><th className="p-3"></th>
             </tr></thead>
-            <tbody>
-              {filteredOverrides.map(o => (
+             <tbody>
+               {filteredOverrides.length === 0 ? (
+                 <tr><td colSpan={9} className="p-12 text-center text-[#5A6378]"><Inbox className="w-10 h-10 mx-auto mb-2 opacity-40" /><p className="font-bold text-lg">No data found</p><p className="text-sm">Try adjusting your search or filter criteria</p></td></tr>
+               ) : filteredOverrides.map(o => (
                 <tr key={o.id} className="border-b border-[#F0EBE2]" data-testid={`override-${o.id}`}>
                   <td className="p-3 font-mono text-xs">{o.id}</td>
                   <td className="p-3 font-bold">{o.label}</td>
@@ -168,8 +242,10 @@ export default function Utilization() {
             <thead className="bg-[#FFF7EE] border-b border-[#EFEAE0]"><tr className="text-left text-[10px] font-extrabold uppercase tracking-wider text-[#5A6378]">
               <th className="p-3">Code</th><th className="p-3">Order ID</th><th className="p-3">Customer</th><th className="p-3 text-right">Order Value</th><th className="p-3">Used at</th><th className="p-3 text-right">Discount</th><th className="p-3 text-right">Commission %</th><th className="p-3 text-right">Commission ₹</th>
             </tr></thead>
-            <tbody>
-              {filteredUtil.map((u, i) => (
+             <tbody>
+               {filteredUtil.length === 0 ? (
+                 <tr><td colSpan={8} className="p-12 text-center text-[#5A6378]"><Inbox className="w-10 h-10 mx-auto mb-2 opacity-40" /><p className="font-bold text-lg">No data found</p><p className="text-sm">Try adjusting your search or filter criteria</p></td></tr>
+               ) : filteredUtil.map((u, i) => (
                 <tr key={i} className="border-b border-[#F0EBE2] hover:bg-[#FFF7EE]" data-testid={`util-row-${u.orderId}`}>
                   <td className="p-3"><span className="font-display">{u.code}</span></td>
                   <td className="p-3 font-mono text-xs">{u.orderId}</td>

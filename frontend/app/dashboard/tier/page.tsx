@@ -6,15 +6,56 @@ import TierProgress from "@/components/TierProgress";
 import { backend } from "@/lib/apiHooks";
 import { useBackend } from "@/lib/useBackend";
 import { useAuth } from "@/lib/auth";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const DEMO_AMB_ID = "amb_005";
+function TierPageSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+        <Skeleton className="h-4 w-80" />
+      </div>
+      <div className="gajab-card p-6 space-y-3">
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-4 w-64" />
+        <div className="flex gap-4 mt-4">
+          <Skeleton className="h-32 flex-1 rounded-2xl" />
+          <Skeleton className="h-32 flex-1 rounded-2xl" />
+        </div>
+      </div>
+      <div>
+        <Skeleton className="h-6 w-48 mb-3" />
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="gajab-card p-5 space-y-3 relative">
+              <Skeleton className="w-16 h-16 rounded-2xl" />
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-3 w-32" />
+              <Skeleton className="h-16 w-full rounded-xl bg-[#FFF7EE]" />
+              <Skeleton className="h-3 w-16" />
+              <div className="space-y-2">
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-3/4" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function TierPage() {
   const { user } = useAuth();
-  const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
+  const ambId = user?.ambassadorId;
   const tierData = useBackend(() => backend.ambassadorTier(ambId), null, [ambId], ["leaderboard", "orders", "commission"], ambId);
+  const tierLoading = tierData === null;
+
   const currentRevenue = tierData?.ambassador?.revenue ?? 0;
   const currentIdx = tiers.findIndex(t => currentRevenue >= t.min && currentRevenue < t.max);
+
+  if (tierLoading) return <TierPageSkeleton />;
 
   return (
     <div className="space-y-5">

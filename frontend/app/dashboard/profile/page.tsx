@@ -6,8 +6,7 @@ import { tiers } from "@/data/options";
 import { useAuth } from "@/lib/auth";
 import { useBackend } from "@/lib/useBackend";
 import { backend } from "@/lib/apiHooks";
-
-const DEMO_AMB_ID = "amb_005";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Field = ({ label, value, type = "text" }) => (
   <label className="block">
@@ -16,11 +15,48 @@ const Field = ({ label, value, type = "text" }) => (
   </label>
 );
 
+function ProfileSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-64 sm:w-80" />
+      </div>
+      <div className="gajab-card p-6 flex items-center gap-4 flex-wrap">
+        <Skeleton className="w-20 h-20 rounded-full" />
+        <div className="flex-1 min-w-0 space-y-2">
+          <Skeleton className="h-7 w-48" />
+          <Skeleton className="h-4 w-64" />
+          <div className="flex items-center gap-2 flex-wrap">
+            <Skeleton className="h-6 w-24 rounded-full" />
+            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-6 w-24 rounded-full" />
+          </div>
+        </div>
+        <Skeleton className="hidden sm:block w-20 h-20 rounded-2xl" />
+      </div>
+      <div className="gajab-card p-6 space-y-4">
+        <Skeleton className="h-5 w-32 mb-3" />
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-1"><Skeleton className="h-3 w-20" /><Skeleton className="h-10 w-full rounded-lg" /></div>
+          <div className="space-y-1"><Skeleton className="h-3 w-20" /><Skeleton className="h-10 w-full rounded-lg" /></div>
+          <div className="space-y-1"><Skeleton className="h-3 w-20" /><Skeleton className="h-10 w-full rounded-lg" /></div>
+          <div className="space-y-1"><Skeleton className="h-3 w-20" /><Skeleton className="h-10 w-full rounded-lg" /></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Profile() {
   const { user } = useAuth();
-  const ambId = user?.ambassadorId ?? DEMO_AMB_ID;
+  const ambId = user?.ambassadorId;
   const ambassador = useBackend(() => backend.ambassadorHome(ambId).then(r => r.ambassador), null, [ambId], ["leaderboard", "orders", "commission"], ambId);
+  const profileLoading = ambassador === null;
   const tier = tiers.find(t => t.name === (ambassador?.tier?.name ?? "Bronze")) || tiers[0];
+
+  if (profileLoading) return <ProfileSkeleton />;
+
   return (
     <div className="space-y-5">
       <div>
