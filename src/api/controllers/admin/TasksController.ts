@@ -39,8 +39,13 @@ export class TaskController {
    */
   @Get("/")
   @ResponseSchema(Task, { isArray: true })
-  async list(@QueryParam("status") status?: string, @QueryParam("q") q?: string): Promise<ApiList<Task>> {
-    return this.service.list({ status, q });
+  async list(
+    @QueryParam("status") status?: string,
+    @QueryParam("q") q?: string,
+    @QueryParam("sortBy") sortBy?: string,
+    @QueryParam("sortOrder") sortOrder?: string,
+  ): Promise<ApiList<Task>> {
+    return this.service.list({ status, q, sortBy, sortOrder });
   }
 
   /**
@@ -52,8 +57,12 @@ export class TaskController {
    */
   @Get("/submissions")
   @ResponseSchema(TaskSubmission, { isArray: true })
-  async submissions(@QueryParam("status") status?: string): Promise<ApiList<TaskSubmission>> {
-    return this.service.submissions(status);
+  async submissions(
+    @QueryParam("status") status?: string,
+    @QueryParam("sortBy") sortBy?: string,
+    @QueryParam("sortOrder") sortOrder?: string,
+  ): Promise<ApiList<TaskSubmission>> {
+    return this.service.submissions(status, sortBy, sortOrder);
   }
 
   @Get("/:id")

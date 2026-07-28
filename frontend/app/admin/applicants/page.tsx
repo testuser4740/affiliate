@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, AlertTriangle, Check, X, Filter, ListChecks } from "lucide-react";
+import { Search, AlertTriangle, Check, X, Filter, ListChecks, Inbox, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { states, cities } from "@/data/options";
 import { backend } from "@/lib/apiHooks";
@@ -25,12 +25,14 @@ export default function Applicants() {
   const [comments, setComments] = useState("");
 
   // Load live applicants from the backend.
-  const rows = useBackend(
+  const rowsData = useBackend(
     () => backend.listApplicants(q || undefined, statusFilter === "All" ? undefined : statusFilter, stateFilter === "All States" ? undefined : stateFilter, cityFilter === "All Cities" ? undefined : cityFilter).then(r => r.data),
     [],
     [q, statusFilter, stateFilter, cityFilter],
     ["applicants", "ambassador_created"],
   );
+  const rows = Array.isArray(rowsData) ? rowsData : [];
+  const loading = !!(rowsData as any)._loading;
 
   const filtered = rows
     .filter(a => statusFilter === "All" || a.status === statusFilter)
@@ -94,7 +96,11 @@ export default function Applicants() {
               <th className="p-3">ID</th><th className="p-3">Name</th><th className="p-3">Phone</th><th className="p-3">College</th><th className="p-3">City</th><th className="p-3">State</th><th className="p-3">Applied</th><th className="p-3">Status</th><th className="p-3">Actions</th>
             </tr></thead>
             <tbody>
-              {filtered.map(a => (
+              {loading ? (
+                <tr><td colSpan={9} className="p-12 text-center text-[#5A6378]"><Loader2 className="w-6 h-6 mx-auto animate-spin mb-2" /><span className="font-bold">Loading applicants…</span></td></tr>
+              ) : filtered.length === 0 ? (
+                <tr><td colSpan={9} className="p-12 text-center text-[#5A6378]"><Inbox className="w-10 h-10 mx-auto mb-2 opacity-40" /><p className="font-bold text-lg">No data found</p><p className="text-sm">Try adjusting your search or filter criteria</p></td></tr>
+              ) : filtered.map(a => (
                 <tr key={a.id} onClick={()=>open(a)} className="border-b border-[#F0EBE2] hover:bg-[#FFF7EE] cursor-pointer" data-testid={`applicant-row-${a.id}`}>
                   <td className="p-3 font-mono text-xs">{a.id}</td>
                   <td className="p-3 font-bold">{a.duplicate && <AlertTriangle className="w-4 h-4 text-[#F26B1F] inline mr-1" />}{a.name}</td>

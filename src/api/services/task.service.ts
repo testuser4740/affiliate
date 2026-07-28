@@ -5,7 +5,7 @@ import { Task } from "../models/tasks";
 import { TaskSubmission } from "../models/task-submissions";
 import { TaskRepository } from "../repositories/TaskRepository";
 import { TaskSubmissionRepository } from "../repositories/TaskSubmissionRepository";
-import { NotFoundError } from "../errors";
+import { NotFoundError, ValidationError } from "../errors";
 import {
   CreateTaskInput,
   UpdateTaskInput,
@@ -17,6 +17,8 @@ import { liveBus } from "../lib/eventBus";
 export interface TaskFilter {
   status?: string;
   q?: string;
+  sortBy?: string;
+  sortOrder?: string;
 }
 
 @Service()
@@ -38,7 +40,11 @@ export class TaskService {
   async list(filter: TaskFilter): Promise<{ data: Task[]; total: number }> {
     const where: Record<string, unknown> = {};
     if (filter.status && filter.status !== "All") where.status = filter.status;
-    const all = await this.repo().find({ where, order: { deadline: "ASC" } });
+    const sortField = filter.sortBy ?? "deadline";
+    const sortDir = filter.sortOrder?.toUpperCase() === "ASC" ? "ASC" : "DESC";
+    const order: Record<string, "ASC" | "DESC"> = {};
+    order[sortField] = sortDir;
+    const all = await this.repo().find({ where, order });
     const data = filter.q
       ? all.filter((t) => `${t.id}${t.title}${t.description}`.toLowerCase().includes(filter.q!.toLowerCase()))
       : all;
@@ -56,6 +62,14 @@ export class TaskService {
     const repo = this.repo();
     const count = await repo.count({ where: { id: Like(`T-%`) } });
     const sequence = (count + 1).toString().padStart(3, "0");
+    if (input.deadline) {
+      const deadlineDate = new Date(input.deadline);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (deadlineDate < today) {
+        throw new ValidationError("Deadline cannot be in the past");
+      }
+    }
     const task = repo.create({
       id: `T-${sequence}`,
       title: input.title,
@@ -146,15 +160,19 @@ export class TaskService {
     return result;
   }
 
-  async submissions(status?: string): Promise<{ data: TaskSubmission[]; total: number }> {
+  async submissions(status?: string, sortBy?: string, sortOrder?: string): Promise<{ data: TaskSubmission[]; total: number }> {
     const where: Record<string, unknown> = {};
     if (status) where.status = status;
-    const data = await this.subRepo().find({ where, order: { createdAt: "DESC" } });
+    const sortField = sortBy ?? "createdAt";
+    const sortDir = sortOrder?.toUpperCase() === "ASC" ? "ASC" : "DESC";
+    const order: Record<string, "ASC" | "DESC"> = {};
+    order[sortField] = sortDir;
+    const data = await this.subRepo().find({ where, order });
     return { data, total: data.length };
   }
 
   async updateSubmission(submission: TaskSubmission): Promise<TaskSubmission> {
-    submission.submittedOn = new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+    submission.submittedOn = new Date().toISOString();
     const saved = await this.subRepo().save(submission);
     liveBus.broadcast({ type: "tasks" });
     return saved;

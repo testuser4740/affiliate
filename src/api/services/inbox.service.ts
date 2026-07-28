@@ -33,7 +33,7 @@ export class InboxService {
       subject: input.subject,
       preview: input.preview ?? input.body.slice(0, 120),
       body: input.body,
-      receivedOn: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+      receivedOn: new Date().toISOString(),
       read: false,
       priority: input.priority ?? "Normal",
     } as Partial<InboxMessage>);

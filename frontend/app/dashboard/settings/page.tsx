@@ -1,8 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { Bell, ShieldCheck, PauseCircle, Lock, Eye, EyeOff, Check, X, Calendar } from "lucide-react";
+import { Bell, ShieldCheck, PauseCircle, Lock, Eye, EyeOff, Check, X, Calendar, Loader2 } from "lucide-react";
 import { useVersion } from "@/hooks/useVersion";
+import { backend } from "@/lib/apiHooks";
 
 const Toggle = ({ label, defaultChecked = true }) => (
   <label className="flex items-center justify-between p-3 rounded-xl border border-[#EFEAE0]">
@@ -27,12 +28,22 @@ export default function AccountSettings() {
   const [pwConfirm, setPwConfirm] = useState("");
   const [pwShow, setPwShow] = useState(false);
 
-  const savePassword = () => {
+  const [pwBusy, setPwBusy] = useState(false);
+
+  const savePassword = async () => {
     if (!pwCurrent) return toast.error("Current password required");
     if (pwNew.length < 8) return toast.error("New password must be at least 8 characters");
     if (pwNew !== pwConfirm) return toast.error("Passwords do not match");
-    toast.success("Password updated successfully");
-    setPwOpen(false); setPwCurrent(""); setPwNew(""); setPwConfirm("");
+    setPwBusy(true);
+    try {
+      await backend.changePassword({ newPassword: pwNew });
+      toast.success("Password updated successfully");
+      setPwOpen(false); setPwCurrent(""); setPwNew(""); setPwConfirm("");
+    } catch {
+      toast.error("Failed to update password");
+    } finally {
+      setPwBusy(false);
+    }
   };
   const cancelPassword = () => { setPwOpen(false); setPwCurrent(""); setPwNew(""); setPwConfirm(""); };
 
@@ -102,7 +113,7 @@ export default function AccountSettings() {
                 {pwShow ? <><EyeOff className="w-3.5 h-3.5" /> Hide passwords</> : <><Eye className="w-3.5 h-3.5" /> Show passwords</>}
               </button>
               <div className="flex gap-2 pt-1">
-                <button onClick={savePassword} className="btn-primary text-sm" data-testid="pw-save"><Check className="w-4 h-4" /> Save</button>
+                <button onClick={savePassword} disabled={pwBusy} className="btn-primary text-sm" data-testid="pw-save">{pwBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} {pwBusy ? "Saving..." : "Save"}</button>
                 <button onClick={cancelPassword} className="btn-ghost text-sm" data-testid="pw-cancel"><X className="w-4 h-4" /> Cancel</button>
               </div>
             </div>

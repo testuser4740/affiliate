@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Search, Users, ShoppingBag, TrendingUp, Upload, Download, Plus, MessageSquare, X, ExternalLink, ArrowLeft, Trophy, ListChecks, IndianRupee, Award, Gift, FileText } from "lucide-react";
+import { Search, Users, ShoppingBag, TrendingUp, Upload, Download, Plus, MessageSquare, X, ExternalLink, ArrowLeft, Trophy, ListChecks, IndianRupee, Award, Gift, FileText, Copy, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { states, cities } from "@/data/options";
 import { backend } from "@/lib/apiHooks";
@@ -26,6 +26,18 @@ export default function Directory() {
   const [loading, setLoading] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [downloading, setDownloading] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const copyLink = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      toast.success("Link copied to clipboard");
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      toast.error("Failed to copy link");
+    }
+  };
 
   const leaderboard = useBackend(() => backend.listAmbassadors().then(r => r.data), [], [refreshKey], ["leaderboard", "orders", "commission"]);
   const adminKpis = useBackend(() => backend.analyticsKpis().then(r => r), {}, [], ["analytics"]);
@@ -125,7 +137,7 @@ export default function Directory() {
           </div>
           <div className="flex gap-2 flex-wrap">
             <button onClick={() => setMsgOpen(detail)} className="btn-ghost text-sm" data-testid="dir-detail-msg"><MessageSquare className="w-4 h-4" /> Message</button>
-            <a href={`https://gajab.com/r/${detail.name.split(" ")[0].toUpperCase()}`} target="_blank" rel="noreferrer" className="btn-primary text-sm"><ExternalLink className="w-4 h-4" /> Affiliate link</a>
+            <button onClick={() => copyLink(`https://gajab.com/r/${detail.name.split(" ")[0].toUpperCase()}`, detail.id)} className="btn-primary text-sm">{copiedId === detail.id ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copiedId === detail.id ? "Copied!" : "Copy link"}</button>
           </div>
         </div>
 
@@ -227,7 +239,7 @@ export default function Directory() {
                     <td className="p-3">{r.city}</td>
                     <td className="p-3 text-xs">{r.state}</td>
                     <td className="p-3"><span className="gajab-sticker bg-[#FFF1C2] text-[#92400E] border border-[#FFC93C]/60">{tier}</span></td>
-                    <td className="p-3 max-w-[180px]"><a href="#" onClick={e => { e.preventDefault(); e.stopPropagation(); toast.success("Affiliate link opened"); }} className="flex items-center gap-1 text-xs text-[#F26B1F] truncate hover:underline"><ExternalLink className="w-3 h-3 flex-shrink-0" />gajab.com/r/{r.name.split(" ")[0].toUpperCase()}</a></td>
+                    <td className="p-3 max-w-[180px]"><button onClick={e => { e.preventDefault(); e.stopPropagation(); copyLink(`https://gajab.com/r/${r.name.split(" ")[0].toUpperCase()}`, r.id); }} className="flex items-center gap-1 text-xs text-[#F26B1F] truncate hover:underline"><ExternalLink className="w-3 h-3 flex-shrink-0" />{copiedId === r.id ? <CheckCircle2 className="w-3 h-3" /> : <Copy className="w-3 h-3" />}gajab.com/r/{r.name.split(" ")[0].toUpperCase()}</button></td>
                     <td className="p-3 text-right font-bold">{r.orders}</td>
                     <td className="p-3 text-right font-display">₹{(r.revenue / 1000).toFixed(0)}K</td>
                     <td className="p-3" onClick={e => e.stopPropagation()}><button onClick={() => setMsgOpen(r)} className="text-xs font-bold text-[#F26B1F] hover:bg-[#FFE9D9] px-2 py-1 rounded-lg flex items-center gap-1" data-testid={`msg-${r.rank}`}><MessageSquare className="w-3 h-3" /> Message</button></td>

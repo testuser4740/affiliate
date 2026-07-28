@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Plus, Check, X, ExternalLink, Search, Filter, ArrowLeft, RotateCw, Bell, AlertTriangle, Clock, Activity, Users, IndianRupee } from "lucide-react";
+import { Plus, Check, X, ExternalLink, Search, Filter, ArrowLeft, RotateCw, Bell, AlertTriangle, Clock, Activity, Users, IndianRupee, Loader2, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import DateInputDDMMYYYY from "@/components/DateInputDDMMYYYY";
 import { get, post } from "@/lib/api";
@@ -44,7 +44,35 @@ export default function AdminTasks() {
   const [filter, setFilter] = useState("All");
   const [rejecting, setRejecting] = useState(null); // { submissionId, ambassador } waiting for rejection reason
   const [rejectReason, setRejectReason] = useState("");
-  const [form, setForm] = useState({ title:"", desc:"", deadline:"", reward:"", target:"all" });
+  const [form, setForm] = useState({ title:"", desc:"", deadline:"", reward:"", target:"all", selectedAmbassadors: [] as string[] });
+  const [ambassadorList, setAmbassadorList] = useState<any[]>([]);
+  const [loadingAmbassadors, setLoadingAmbassadors] = useState(false);
+  const [ambSearch, setAmbSearch] = useState("");
+
+  const loadAmbassadors = async () => {
+    setLoadingAmbassadors(true);
+    try {
+      const res = await get("/admin/ambassadors") as any;
+      setAmbassadorList(res.data ?? []);
+    } catch {
+      toast.error("Failed to load ambassadors");
+    } finally {
+      setLoadingAmbassadors(false);
+    }
+  };
+
+  const toggleAmbassador = (id: string) => {
+    setForm(prev => ({
+      ...prev,
+      selectedAmbassadors: prev.selectedAmbassadors.includes(id)
+        ? prev.selectedAmbassadors.filter(a => a !== id)
+        : [...prev.selectedAmbassadors, id],
+    }));
+  };
+
+  const filteredAmbassadors = ambassadorList.filter(a =>
+    (a.name + a.college + a.city + a.state + a.email).toLowerCase().includes(ambSearch.toLowerCase())
+  );
 
   const tasks = useBackend<Task[]>(() => get("/admin/tasks").then(r => (r as any).data), [], [], ["tasks"]);
   const submissions = useBackend<TaskSubmission[]>(() => get("/admin/tasks/submissions").then(r => (r as any).data), [], [], ["tasks"]);
@@ -76,6 +104,12 @@ export default function AdminTasks() {
       let targets = allAmbassadors;
       if (form.target === "gold") {
         targets = allAmbassadors.filter((a: any) => parseInt(a.revenue) >= 150000);
+      } else if (form.target === "specific") {
+        targets = allAmbassadors.filter((a: any) => form.selectedAmbassadors.includes(a.id));
+        if (targets.length === 0) {
+          toast.error("Please select at least one ambassador");
+          return;
+        }
       }
 
       let assignedCount = 0;
@@ -93,7 +127,7 @@ export default function AdminTasks() {
 
       toast.success(`Task created & assigned to ${assignedCount} ambassador(s)`);
       setOpen(false);
-      setForm({ title:"", desc:"", deadline:"", reward:"", target:"all" });
+      setForm({ title:"", desc:"", deadline:"", reward:"", target:"all", selectedAmbassadors: [] });
     } catch (err) {
       toast.error("Failed to create task");
     }
@@ -237,7 +271,26 @@ export default function AdminTasks() {
             <label className="block"><span className="text-xs font-bold uppercase tracking-wider text-[#5A6378]">Description</span><textarea value={form.desc} onChange={e=>setForm({...form, desc:e.target.value})} rows={3} className="input-gajab mt-1 py-3 h-auto resize-none" data-testid="task-desc" /></label>
             <label className="block"><span className="text-xs font-bold uppercase tracking-wider text-[#5A6378]">Reward (₹)</span><input type="number" min="0" value={form.reward} onChange={e=>setForm({...form, reward:e.target.value})} placeholder="0" className="input-gajab mt-1" data-testid="task-reward" /></label>
             <label className="block"><span className="text-xs font-bold uppercase tracking-wider text-[#5A6378]">Deadline (dd/mm/yyyy)</span><div className="mt-1"><DateInputDDMMYYYY value={form.deadline} onChange={v=>setForm({...form, deadline:v})} testId="task-deadline" /></div></label>
-            <label className="block"><span className="text-xs font-bold uppercase tracking-wider text-[#5A6378]">Assign to</span><select value={form.target} onChange={e=>setForm({...form, target:e.target.value})} className="input-gajab mt-1"><option value="all">All ambassadors</option><option value="gold">Gold tier+</option><option value="specific">Specific ambassadors</option></select></label>
+            <label className="block"><span className="text-xs font-bold uppercase tracking-wider text-[#5A6378]">Assign to</span><select value={form.target} onChange={e=>{setForm({...form, target:e.target.value, selectedAmbassadors: []}); if (e.target.value === "specific") loadAmbassadors();}} className="input-gajab mt-1"><option value="all">All ambassadors</option><option value="gold">Gold tier+</option><option value="specific">Specific ambassadors</option></select></label>
+            {form.target === "specific" && (
+              <div className="border border-[#EFEAE0] rounded-xl overflow-hidden">
+                <div className="relative p-2 border-b border-[#EFEAE0]"><Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A6378]" /><input value={ambSearch} onChange={e=>setAmbSearch(e.target.value)} placeholder="Search ambassadors..." className="input-gajab pl-8 h-9 text-sm" /></div>
+                <div className="max-h-48 overflow-y-auto p-1 space-y-0.5">
+                  {loadingAmbassadors ? (
+                    <div className="p-4 text-center text-[#5A6378] text-sm"><Loader2 className="w-5 h-5 mx-auto animate-spin mb-1" />Loading...</div>
+                  ) : filteredAmbassadors.length === 0 ? (
+                    <div className="p-4 text-center text-[#5A6378] text-sm">No ambassadors found</div>
+                  ) : filteredAmbassadors.map(a => (
+                    <label key={a.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#FFF7EE] cursor-pointer text-sm">
+                      <input type="checkbox" checked={form.selectedAmbassadors.includes(a.id)} onChange={() => toggleAmbassador(a.id)} className="accent-[#F26B1F]" />
+                      <div className="flex-1 min-w-0"><span className="font-bold">{a.name}</span><span className="text-xs text-[#5A6378] ml-2">{a.college}</span></div>
+                      <span className="text-xs text-[#5A6378]">₹{(a.revenue/1000).toFixed(0)}K</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="p-2 border-t border-[#EFEAE0] bg-[#FFF7EE] text-xs text-[#5A6378] font-bold">{form.selectedAmbassadors.length} selected</div>
+              </div>
+            )}
             <button className="btn-primary w-full" data-testid="submit-task-btn"><Plus className="w-4 h-4" /> Create & Assign</button>
           </form>
         </div>

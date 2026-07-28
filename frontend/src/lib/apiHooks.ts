@@ -210,6 +210,9 @@ export const backend = {
   sendMessage: (ambassadorId: string, body: { from: string; subject: string; body: string }) =>
     post<InboxMessage>(`/admin/ambassadors/${ambassadorId}/inbox`, body),
 
+  changePassword: (body: { newPassword: string }) =>
+    put<{ message: string }>("/auth/password", body),
+
   // Reports
   downloadAmbassadorList: () =>
     downloadBlob(

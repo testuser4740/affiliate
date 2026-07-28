@@ -2,11 +2,10 @@
 import React, { useRef } from "react";
 import { Calendar } from "lucide-react";
 
-// India-friendly dd/mm/yyyy date picker.
-// Uses native HTML5 date input under the hood but always displays dd/mm/yyyy.
-export default function DateInputDDMMYYYY({ value, onChange, placeholder = "dd/mm/yyyy", testId }) {
+export default function DateInputDDMMYYYY({ value, onChange, placeholder = "dd/mm/yyyy", testId, min }: { value: any; onChange: any; placeholder?: string; testId?: string; min?: string }) {
   const ref = useRef(null);
   const display = value ? value.split("-").reverse().join("/") : "";
+  const today = new Date().toISOString().split("T")[0];
 
   const open = () => {
     if (!ref.current) return;
@@ -20,6 +19,13 @@ export default function DateInputDDMMYYYY({ value, onChange, placeholder = "dd/m
     } else {
       ref.current.click();
     }
+  };
+
+  const handleChange = (e) => {
+    const val = e.target.value;
+    if (min && val < min) return;
+    if (!min && val < today) return;
+    onChange(val);
   };
 
   return (
@@ -38,7 +44,8 @@ export default function DateInputDDMMYYYY({ value, onChange, placeholder = "dd/m
         ref={ref}
         type="date"
         value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
+        min={min || today}
+        onChange={handleChange}
         className="absolute opacity-0 pointer-events-none w-0 h-0"
         tabIndex={-1}
       />

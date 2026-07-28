@@ -204,7 +204,7 @@ export class ApplicantService {
         subject: "Welcome to Gajab Ambassadors! 🎉",
         preview: "Your account is live. Share your link and start earning.",
         body: "Welcome aboard! Your ambassador account is now active. Share your magic link, complete tasks, and watch your commissions grow.",
-        receivedOn: new Date().toLocaleString("en-IN"),
+        receivedOn: new Date().toISOString(),
         read: false,
         priority: "Normal",
       } as Partial<InboxMessage>),

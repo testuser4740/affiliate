@@ -3,39 +3,42 @@ import { useEffect, useState } from "react";
 import { backend } from "./apiHooks";
 import { useEventStream, LiveEventType } from "@/hooks/useEventStream";
 
-// Loads live data from the backend and falls back to the provided mock value
-// if the request fails or the API is not running. Keeps the app usable in demo mode.
 export function useBackend<T>(
   loader: () => Promise<T>,
   fallback: T,
   deps: unknown[] = [],
   liveEvents?: LiveEventType[],
   ambassadorId?: string,
-): T {
+): T & { _loading?: boolean } {
   const [data, setData] = useState<T>(fallback);
+  const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
 
   const load = () => {
+    setLoading(true);
     loader()
       .then((res) => {
         if (res !== undefined && res !== null) setData(res);
       })
-      .catch(() => {
-        /* keep fallback (mock data) */
-      });
+      .catch(() => {})
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, tick]);
 
-  // Open a single live SSE connection; re-fetch whenever a relevant event arrives.
   useEventStream((event) => {
     if (liveEvents && liveEvents.includes(event.type)) {
       setTick((t) => t + 1);
     }
   }, Boolean(liveEvents), ambassadorId);
 
-  return data;
+  if (Array.isArray(data)) {
+    (data as any)._loading = loading;
+  } else if (data && typeof data === "object") {
+    (data as any)._loading = loading;
+  }
+
+  return data as T & { _loading?: boolean };
 }
